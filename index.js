@@ -122,11 +122,14 @@
     }
 
     const begin = new Date().getTime();    
-    const body = document.getElementsByTagName('body')[0];
+    const $body = document.getElementsByTagName('body')[0];
 
-    const bRefresh = document.createElement('button');
-    bRefresh.innerText = 'Refresh';
-    body.appendChild(bRefresh);
+    const $refresh = document.createElement('button');
+    $refresh.innerText = 'Refresh';
+    const $cube = document.createElement('div');
+    $body.appendChild($refresh);
+    $body.appendChild($cube);
+
     refreshCube();
     console.log(`Finished. Elapsed: ${new Date().getTime() - begin}`);
 
@@ -213,9 +216,9 @@
         };
         console.log(`${ll.name} selected.`);
         const cube = generateCube(condition);
-        body.appendChild(cube);
-        bRefresh.onclick = () => {
-            body.removeChild(cube);
+        $cube.appendChild(cube);
+        $refresh.onclick = () => {
+            $cube.removeChild(cube);
             refreshCube();
         };
     }
