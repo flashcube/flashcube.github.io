@@ -1,6 +1,5 @@
 ;(function() {
     const settings = {
-        colorSide: true,
         axis: ['r','b','o','g','y','w'], // B,R,F,L,U,D
         llConditions: [
             {
@@ -122,13 +121,15 @@
     }
 
     const begin = new Date().getTime();    
-    const $body = document.getElementsByTagName('body')[0];
+    const $header = document.getElementsByTagName('header')[0];
+    const $article = document.getElementsByTagName('article')[0];
+    const $footer = document.getElementsByTagName('footer')[0];
 
     const $refresh = document.createElement('button');
     $refresh.innerText = 'Refresh';
     const $cube = document.createElement('div');
-    $body.appendChild($refresh);
-    $body.appendChild($cube);
+    $header.appendChild($refresh);
+    $article.appendChild($cube);
 
     refreshCube();
     console.log(`Finished. Elapsed: ${new Date().getTime() - begin}`);
@@ -195,6 +196,7 @@
         }
         // F-face
         if (consts.size * 2 == row && (consts.size <= col && col < consts.size * 2)) {
+            td.classList.add('f-face');
             td.classList.add(consts.colorMap[condition.ll.state[consts.size * 3 + 2 - col]]);
         }
         // L-face
@@ -205,14 +207,15 @@
     }
 
     function refreshCube() {
-        const ll = getRandomFromArray(settings.llConditions);
+        const candidates = filterConditions(settings.llConditions);
+        const ll = getRandomFromArray(candidates);
         const condition = {
             axis: shiftRandomAxis(settings.axis),
             ll: {
                 name: ll.name,
                 state: shuffleColorLL(shiftRandomLL(ll.state.split('')), settings.axis)
             },
-            colorSide: settings.colorSide
+            colorSide: document.getElementById(`option_colorSide`).checked
         };
         console.log(`${ll.name} selected.`);
         const cube = generateCube(condition);
@@ -221,6 +224,16 @@
             $cube.removeChild(cube);
             refreshCube();
         };
+    }
+
+    function filterConditions(conds) {
+        const candidates = [];
+        for (let c of conds) {
+            if (document.getElementById(`option_${c.name}`).checked) {
+                candidates.push(c);
+            }
+        }
+        return candidates;
     }
 
     // a: string[] // length=6(side*4 + U + D)
