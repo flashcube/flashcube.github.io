@@ -131,6 +131,10 @@
     $header.appendChild($refresh);
     $article.appendChild($cube);
 
+    const options = loadOptions();
+    updateOptionsCtrl(options);
+    console.log(`load stored options: ${JSON.stringify(options)}`);
+
     refreshCube();
     console.log(`Finished. Elapsed: ${new Date().getTime() - begin}`);
 
@@ -187,27 +191,29 @@
             td.classList.add('u-face');
         }
         // B-face
-        if (row == consts.size - 1 && (consts.size <= col && col < consts.size * 2)) {
+        if (row === consts.size - 1 && (consts.size <= col && col < consts.size * 2)) {
             td.classList.add(consts.colorMap[condition.ll.state[col - consts.size]]);
         }
         // R-face
-        if ((consts.size <= row && row < consts.size * 2) && consts.size * 2 == col) {
+        if ((consts.size <= row && row < consts.size * 2) && consts.size * 2 === col) {
             td.classList.add(consts.colorMap[condition.ll.state[row]]);
         }
         // F-face
-        if (consts.size * 2 == row && (consts.size <= col && col < consts.size * 2)) {
+        if (consts.size * 2 === row && (consts.size <= col && col < consts.size * 2)) {
             td.classList.add('f-face');
             td.classList.add(consts.colorMap[condition.ll.state[consts.size * 3 + 2 - col]]);
         }
         // L-face
-        if ((consts.size <= row && row < consts.size * 2) && col == consts.size - 1) {
+        if ((consts.size <= row && row < consts.size * 2) && col === consts.size - 1) {
             td.classList.add(consts.colorMap[condition.ll.state[consts.size * 4 + 2 - row]]);
         }
         return td;
     }
 
     function refreshCube() {
-        const candidates = filterConditions(settings.llConditions);
+        const options = parseOptions();
+        storeOptions(options);
+        const candidates = filterConditions(settings.llConditions, options);
         const ll = getRandomFromArray(candidates);
         const condition = {
             axis: shiftRandomAxis(settings.axis),
@@ -215,7 +221,7 @@
                 name: ll.name,
                 state: shuffleColorLL(shiftRandomLL(ll.state.split('')), settings.axis)
             },
-            colorSide: document.getElementById(`option_colorSide`).checked
+            colorSide: options['option_colorSide']
         };
         console.log(`${ll.name} selected.`);
         const cube = generateCube(condition);
@@ -226,10 +232,49 @@
         };
     }
 
-    function filterConditions(conds) {
+    function parseOptions() {
+        const options = {};
+        const $optionList = document.getElementById('optionList');
+        const lis = $optionList.children;
+        for (const li of lis) {
+            for (const c of li.children) {
+                if (!!c.id && c.id.startsWith('option_')) {
+                    if (c.type === 'checkbox') {
+                        options[c.id] = c.checked;
+                    } else {
+                        options[c.id] = c.value;
+                    }
+                }
+            }
+        }
+        return options;
+    }
+
+    function loadOptions() {
+        const optionString = decodeURIComponent(document.cookie).replace(/^options=(.*)$/, '$1');
+        return JSON.parse(optionString || "{}");
+    }
+
+    function updateOptionsCtrl(options) {
+        for (let o in options) {
+            const elem = document.getElementById(o);
+            if (!elem) continue;
+            if (elem.type === 'checkbox') {
+                elem.checked = options[o];
+            } else {
+                elem.value = options[o];
+            }
+        }
+    }
+
+    function storeOptions(options) {
+        document.cookie = encodeURIComponent(`options=${JSON.stringify(options)}`);
+    }
+
+    function filterConditions(conds, options) {
         const candidates = [];
         for (let c of conds) {
-            if (document.getElementById(`option_${c.name}`).checked) {
+            if (Boolean(options[`option_${c.name}`]) === true) {
                 candidates.push(c);
             }
         }
