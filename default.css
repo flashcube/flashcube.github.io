@@ -1,0 +1,33 @@
+body {
+    background-color: black;
+}
+.cell {
+    width: 0.5em;
+    height: 0.5em;
+}
+.u-face {
+    width: 3em;
+    height: 3em;
+}
+.f-face {
+    width: 3em;
+    height: 2em;
+}
+.red {
+    background-color: red;
+}
+.blue {
+    background-color: blue;
+}
+.orange {
+    background-color: orange;
+}
+.green {
+    background-color: green;
+}
+.yellow {
+    background-color: yellow;
+}
+.white {
+    background-color: white;
+}
