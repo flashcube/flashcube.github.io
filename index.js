@@ -317,7 +317,7 @@
     }
 
     function onMousemove(event) {
-        const { clientX, clientY } = event;
+        const { clientX, clientY } = getPos(event);
         const dx = baseMousePos.x === null ? 0 : (clientX - baseMousePos.x);
         const dy = baseMousePos.y === null ? 0 : (baseMousePos.y - clientY);
         cubePointer.x = Math.max(Math.min(cubePointer.x + dy, 375), 230);
@@ -325,6 +325,21 @@
         $cube.style.transform = `rotateX(${cubePointer.x}deg) rotateY(${cubePointer.y}deg)`;
         baseMousePos.x = clientX;
         baseMousePos.y = clientY;
+    }
+
+    function getPos(event) {
+        let clientX, clientY;
+        if (event.touches && event.touches[0]) {
+            clientX = event.touches[0].clientX;
+            clientY = event.touches[0].clientY;
+        } else if (event.originalEvent && event.originalEvent.changedTouches[0]) {
+            clientX = event.originalEvent.changedTouches[0].clientX;
+            clientY = event.originalEvent.changedTouches[0].clientY;
+        } else if (event.clientX && event.clientY) {
+            clientX = event.clientX;
+            clientY = event.clientY;
+        }
+        return { clientX, clientY };
     }
 
     function onTouchStart(_) {
