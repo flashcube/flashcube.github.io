@@ -1,90 +1,90 @@
 ;(function() {
     const settings = {
-        axis: ['r','b','o','g','y','w'], // B,R,F,L,U,D
+        axis: ['y','g','o','b','r','w'], // U,F,R,B,L,D
         llConditions: [
             {
                 name: 'U-perm:b',
-                state: 'gggrbrboboro' // BBB->RRR->FFF->LLL
+                state: 'bobrbrgggoro' // FFF->RRR->BBB->LLL
             },
             {
                 name: 'U-perm:a',
-                state: 'gggrorbrbobo'
+                state: 'brbrorgggobo'
             },
             {
                 name: 'A-perm:b',
-                state: 'ggborgrbrboo'
+                state: 'rbrgrobggoob'
             },
             {
                 name: 'A-perm:a',
-                state: 'ggrbrbobgroo'
+                state: 'gbobrbrggoor'
             },
             {
                 name: 'Z-perm',
-                state: 'gogrbrbrbogo'
+                state: 'brbrbrgogogo'
             },
             {
                 name: 'H-perm',
-                state: 'gbgrorbgboro'
+                state: 'bgbrorgbgoro'
             },
             {
                 name: 'E-perm',
-                state: 'ogrbrgrbogob'
+                state: 'obrgrbrgobog'
             },
             {
                 name: 'T-perm',
-                state: 'ggrbogrbboro'
+                state: 'bbrgobrggoro'
             },
             {
                 name: 'V-perm',
-                state: 'obrbrgrooggb'
+                state: 'oorgrbrbobgg'
             },
             {
                 name: 'F-perm',
-                state: 'gbrbrgrgbooo'
+                state: 'bgrgrbrbgooo'
             },
             {
                 name: 'R-perm:b',
-                state: 'rgogbrbrboog'
+                state: 'brbrbgogrgoo'
             },
             {
                 name: 'R-perm:a',
-                state: 'obgrgogrrbob'
+                state: 'rrgogrgbobob'
             },
             {
                 name: 'J-perm:b',
-                state: 'ggrbbgrrbooo'
+                state: 'brrgbbrggooo'
             },
             {
                 name: 'J-perm:a',
-                state: 'oggrrrboogbb'
+                state: 'oobrrrggobbg'
             },
             {
                 name: 'Y-perm',
-                state: 'bogrrogbbogr'
+                state: 'bbgorrgobrgo'
             },
             {
                 name: 'G-perm:d',
-                state: 'gbrbggroboro'
+                state: 'borggbrbgoro'
             },
             {
                 name: 'G-perm:c',
-                state: 'oggrbogorbrb'
+                state: 'rogobrggobrb'
             },
             {
                 name: 'G-perm:a',
-                state: 'robogrbbogrg'
+                state: 'obbrgoborgrg'
             },
             {
                 name: 'G-perm:b',
-                state: 'gorbbgrgboro'
+                state: 'bgrgbbrogoro'
             },
             {
                 name: 'N-perm:b',
-                state: 'bggroogbborr'
+                state: 'bbgoorggbrro'
             },
             {
                 name: 'N-perm:a',
-                state: 'bbgrroggboor'
+                state: 'bggorrgbbroo'
             }
         ]
     };
@@ -97,10 +97,19 @@
             o: 'orange',
             g: 'green',
             y: 'yellow',
-            w: 'white'
+            w: 'white',
+            x: 'gray'
         }
     };
 
+    const baseMousePos = {
+        x: 0,
+        y: 0
+    };
+    const cubePointer = {
+        x: null,
+        y: null
+    };
     // Validate llConditions (Not Strict)
     for (let i = 0; i < settings.llConditions.length; i++) {
         const cond = settings.llConditions[i];
@@ -121,14 +130,12 @@
     }
 
     const begin = new Date().getTime();    
-    const $header = document.getElementsByTagName('header')[0];
+    const $body = document.getElementsByTagName('body')[0];
+    $body.addEventListener('mousemove', onMousemove);
     const $article = document.getElementsByTagName('article')[0];
-    const $footer = document.getElementsByTagName('footer')[0];
 
-    const $refresh = document.createElement('button');
-    $refresh.innerText = 'Refresh';
     const $cube = document.createElement('div');
-    $header.appendChild($refresh);
+    $cube.classList.add('cube');
     $article.appendChild($cube);
 
     const options = loadOptions();
@@ -138,77 +145,40 @@
     refreshCube();
     console.log(`Finished. Elapsed: ${new Date().getTime() - begin}`);
 
+
     // condition: {
-    //     side: string[],
-    //     ll: string[],
+    //     stickers: {
+    //         u: 'yyyyyyyyy',
+    //         f: 'ggggggggg',
+    //         r: 'ooooooooo',
+    //         b: 'bbbbbbbbb',
+    //         l: 'rrrrrrrrr',
+    //         d: 'wwwwwwwww'
+    //     },
     //     size: number // game size
     // }
     function generateCube(condition) {
-        const cube = document.createElement('table');
-        cube.classList.add('cube');
-        for (let row = 0; row < consts.size * 3; row++) {
-            const tr = document.createElement('tr');
-            for (let col = 0; col < consts.size * 3; col++) {
-                const td = createCell(row, col, condition)
-                tr.appendChild(td);
-            }
-            cube.appendChild(tr);
-        }
-        return cube;
-    }
+        const $disposableCube = document.createElement('div');
+        const faces = 'ubrfld'.split('');
 
-    function createCell(row, col, condition) {
-        const td = document.createElement('td');
-        if ((consts.size <= row && row < consts.size * 2) || (consts.size <= col && col < consts.size * 2)) {
-            td.classList.add('cell');
-        }
-
-        // Color Middle Layer cells
-        // B-face
-        if (condition.colorSide) {
-            if (row < consts.size - 1 && (consts.size <= col && col < consts.size * 2)) {
-                td.classList.add(consts.colorMap[condition.axis[0]]);
-            }
-            // R-face
-            if ((consts.size <= row && row < consts.size * 2) && consts.size * 2 + 1 <= col) {
-                td.classList.add(consts.colorMap[condition.axis[1]]);
-            }
-            // F-face
-            if (consts.size * 2 <= row && (consts.size <= col && col < consts.size * 2)) {
-                td.classList.add('f-face');
-                if (consts.size * 2 + 1 <= row) {
-                    td.classList.add(consts.colorMap[condition.axis[2]]);
+        for (let face of faces) {
+            const $face = document.createElement('div');
+            $face.classList.add(`face`);
+            $face.classList.add(`${face}-face`);
+            const faceStickers = condition.stickers[face];
+            for (let row = 0; row < condition.size; row++) {
+                for (let col = 0; col < condition.size; col++) {
+                    const $cell = document.createElement('div');
+                    $cell.classList.add('cell');
+                    $cell.classList.add(`pif-top-${row}`);
+                    $cell.classList.add(`pif-left-${col}`);
+                    $cell.classList.add(consts.colorMap[faceStickers[row * consts.size + col]]);
+                    $face.appendChild($cell);
                 }
-            }
-            // L-face
-            if ((consts.size <= row && row < consts.size * 2) && col < consts.size - 1) {
-                td.classList.add(consts.colorMap[condition.axis[3]]);
-            }
+            }            
+            $disposableCube.appendChild($face);
         }
-        // Color LL cells
-        // U-face
-        if (consts.size <= row && row < consts.size * 2 && consts.size <= col && col < consts.size * 2) {
-            td.classList.add(consts.colorMap[condition.axis[4]]);
-            td.classList.add('u-face');
-        }
-        // B-face
-        if (row === consts.size - 1 && (consts.size <= col && col < consts.size * 2)) {
-            td.classList.add(consts.colorMap[condition.ll.state[col - consts.size]]);
-        }
-        // R-face
-        if ((consts.size <= row && row < consts.size * 2) && consts.size * 2 === col) {
-            td.classList.add(consts.colorMap[condition.ll.state[row]]);
-        }
-        // F-face
-        if (consts.size * 2 === row && (consts.size <= col && col < consts.size * 2)) {
-            td.classList.add('f-face');
-            td.classList.add(consts.colorMap[condition.ll.state[consts.size * 3 + 2 - col]]);
-        }
-        // L-face
-        if ((consts.size <= row && row < consts.size * 2) && col === consts.size - 1) {
-            td.classList.add(consts.colorMap[condition.ll.state[consts.size * 4 + 2 - row]]);
-        }
-        return td;
+        return $disposableCube;
     }
 
     function refreshCube() {
@@ -216,21 +186,46 @@
         storeOptions(options);
         const candidates = filterConditions(settings.llConditions, options);
         const ll = getRandomFromArray(candidates);
+        const shuffled = shuffleColorLL(shiftRandomLL(ll.state.split('')), settings.axis);
+        const randomedAxis = shiftRandomAxis(settings.axis);
+        const stickers = toPllStickers(shuffled, randomedAxis);
+
+        // Apply non-color side
+        if (!options['option_colorSide']) {
+            for (let f of 'frbl'.split('')) {
+                stickers[f] = stickers[f].substr(0, consts.size) + 'x'.repeat(consts.size * (consts.size - 1));
+            }
+            stickers['d'] = 'x'.repeat(consts.size ** 2);
+        }
+
         const condition = {
-            axis: shiftRandomAxis(settings.axis),
-            ll: {
-                name: ll.name,
-                state: shuffleColorLL(shiftRandomLL(ll.state.split('')), settings.axis)
-            },
-            colorSide: options['option_colorSide']
+            stickers,
+            size: consts.size
         };
         console.log(`${ll.name} selected.`);
+        cubePointer.x = 280;
+        cubePointer.y = -17.5;
+        $cube.style.transform = `rotateX(${cubePointer.x}deg) rotateY(${cubePointer.y}deg)`;
+        baseMousePos.x = baseMousePos.y = null;
         const cube = generateCube(condition);
         $cube.appendChild(cube);
-        $refresh.onclick = () => {
+        $cube.onclick = () => {
             $cube.removeChild(cube);
             refreshCube();
         };
+    }
+
+    function toPllStickers(arr, axis) {
+        const ud = consts.size**2;
+        const frbl = ud - consts.size;
+        return {
+            u: axis[0].repeat(ud),
+            f: arr.slice(0, 3).join('') + axis[1].repeat(frbl),
+            r: arr.slice(3, 6).join('') + axis[2].repeat(frbl),
+            b: arr.slice(6, 9).join('') + axis[3].repeat(frbl),
+            l: arr.slice(9, 12).join('') + axis[4].repeat(frbl),
+            d: axis[5].repeat(ud)
+        }
     }
 
     function parseOptions() {
@@ -282,15 +277,15 @@
         return candidates;
     }
 
-    // a: string[] // length=6(side*4 + U + D)
+    // a: string[] // length=6(U + side*4 + D)
     function shiftRandomAxis(a) {
         const ra = [];
-        
-        const shift = Math.floor(Math.random() * a.length);
+
+        ra.push(a[0]);
+        const shift = Math.floor(Math.random() * 4);
         for (let i = 0; i < 4; i++) {
-            ra.push(a[(i + shift) % 4]);
+            ra.push(a[(i + shift) % 4 + 1]);
         }
-        ra.push(a[4]);
         ra.push(a[5]);
         return ra;
     }
@@ -309,7 +304,7 @@
     function shuffleColorLL(a, axis) {
         const shuffled = shiftRandomAxis(axis);
         const map = {};
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 6; i++) {
             map[axis[i]] = shuffled[i];
         }
         return a.map(e => map[e]);
@@ -317,5 +312,16 @@
     
     function getRandomFromArray(a) {
         return a[Math.floor(Math.random() * a.length)];
+    }
+
+    function onMousemove(event) {
+        const { clientX, clientY } = event;
+        const dx = baseMousePos.x === null ? 0 : (clientX - baseMousePos.x);
+        const dy = baseMousePos.y === null ? 0 : (baseMousePos.y - clientY);
+        cubePointer.x = Math.max(Math.min(cubePointer.x + dy, 375), 230);
+        cubePointer.y = cubePointer.y + dx;
+        $cube.style.transform = `rotateX(${cubePointer.x}deg) rotateY(${cubePointer.y}deg)`;
+        baseMousePos.x = clientX;
+        baseMousePos.y = clientY;
     }
 })();
