@@ -103,8 +103,8 @@
     };
 
     const baseMousePos = {
-        x: 0,
-        y: 0
+        x: null,
+        y: null
     };
     const cubePointer = {
         x: null,
@@ -132,6 +132,8 @@
     const begin = new Date().getTime();    
     const $body = document.getElementsByTagName('body')[0];
     $body.addEventListener('mousemove', onMousemove);
+    $body.addEventListener('touchstart', onTouchStart);
+    $body.addEventListener('touchmove', onMousemove);
     const $article = document.getElementsByTagName('article')[0];
 
     const $cube = document.createElement('div');
@@ -323,5 +325,9 @@
         $cube.style.transform = `rotateX(${cubePointer.x}deg) rotateY(${cubePointer.y}deg)`;
         baseMousePos.x = clientX;
         baseMousePos.y = clientY;
+    }
+
+    function onTouchStart(_) {
+        baseMousePos.x = baseMousePos.y = null;
     }
 })();
