@@ -14,20 +14,61 @@ article {
     flex-direction: column;
 }
 .cube {
+    position: absolute;
+    top: 40vh;
     margin: 0;
+    transform-style: preserve-3d;
+}
+.face {
+    position: absolute;
+    width: 18vw;
+    height: 18vw;
 }
 .cell {
-    width: 1vw;
-    height: 1vw;
-}
-.u-face {
+    position: absolute;
     width: 6vw;
     height: 6vw;
+    border: 0.2vw solid #000000;
+    box-sizing: border-box;
+}
+.pif-top-0 {
+    top: 0;
+}
+.pif-top-1 {
+    top: 6vw;
+}
+.pif-top-2 {
+    top: 12vw;
+}
+.pif-left-0 {
+    left: 0;
+}
+.pif-left-1 {
+    left: 6vw;
+}
+.pif-left-2 {
+    left: 12vw;
+}
+
+.u-face {
+    transform: translateY(-100%) rotateX(90deg) translateX(-50%);
+}
+.d-face {
+    transform: rotateX(-90deg) translateX(-50%);
+}
+.b-face {
+    transform: translateY(-50%) rotateY(90deg) translateX(50%) rotateY(90deg) translateX(50%);
+}
+.r-face {
+    transform: translateY(-50%) rotateY(90deg);
 }
 .f-face {
-    width: 6vw;
-    height: 4vw;
+    transform: translateY(-50%) rotateY(90deg) translateX(-50%) rotateY(-90deg) translateX(-50%);
 }
+.l-face {
+    transform: translateY(-50%) translateX(-100%) rotateY(-90deg);
+}
+
 .red {
     background-color: rgb(255, 0, 0);
 }
@@ -45,4 +86,7 @@ article {
 }
 .white {
     background-color: white;
+}
+.gray {
+    background-color: gray;
 }
