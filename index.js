@@ -145,6 +145,7 @@
     // }
     function generateCube(condition) {
         const cube = document.createElement('table');
+        cube.classList.add('cube');
         for (let row = 0; row < consts.size * 3; row++) {
             const tr = document.createElement('tr');
             for (let col = 0; col < consts.size * 3; col++) {
