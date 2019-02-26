@@ -187,6 +187,9 @@
         const options = parseOptions();
         storeOptions(options);
         const candidates = filterConditions(settings.llConditions, options);
+        if (candidates.length === 0) {
+            candidates.push(settings.llConditions[0]);
+        }
         const ll = getRandomFromArray(candidates);
         const shuffled = shuffleColorLL(shiftRandomLL(ll.state.split('')), settings.axis);
         const randomedAxis = shiftRandomAxis(settings.axis);
