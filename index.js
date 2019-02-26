@@ -140,9 +140,31 @@
     $cube.classList.add('cube');
     $article.appendChild($cube);
 
+    const $checkAll = document.getElementById('btn_checkAll');
     const options = loadOptions();
     updateOptionsCtrl(options);
     console.log(`load stored options: ${JSON.stringify(options)}`);
+    $checkAll.onclick = () => {
+        const $optionList = document.getElementById('optionList');
+        const lis = $optionList.children;
+        let allChecked = true;
+        for (const li of lis) {
+            for (const c of li.children) {
+                if (c.checked === false) {
+                    allChecked = false;
+                }
+            }
+            if (!allChecked) {
+                break;
+            }
+        }
+        for (const li of lis) {
+            for (const c of li.children) {
+                c.checked = !allChecked;
+            }
+        }
+    };
+
 
     refreshCube();
     console.log(`Finished. Elapsed: ${new Date().getTime() - begin}`);
