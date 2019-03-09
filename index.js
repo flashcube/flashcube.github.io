@@ -230,8 +230,8 @@
             size: consts.size
         };
         console.log(`${ll.name} selected.`);
-        cubePointer.x = 300;
-        cubePointer.y = -35;
+        cubePointer.x = 345;
+        cubePointer.y = -40;
         $cube.style.transform = `rotateX(${cubePointer.x}deg) rotateY(${cubePointer.y}deg)`;
         baseMousePos.x = baseMousePos.y = null;
         const cube = generateCube(condition);
