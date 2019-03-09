@@ -12,6 +12,11 @@ article {
     display: flex;
     align-items: center;
     flex-direction: column;
+    perspective: 800;
+    -moz-perspective: 800;
+    -webkit-perspective: 800;
+    -o-perspective: 800;
+    -ms-perspective: 800;
 }
 .cube {
     position: absolute;
