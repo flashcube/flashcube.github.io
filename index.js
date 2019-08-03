@@ -116,7 +116,7 @@
         const name = cond.name ? `(${cond.name}) ` : '';
         if (cond.state.length != consts.size * 4) {
             console.log(`llConditions[${i}] ${name}is invalid size`);
-        } 
+        }
         const map = {};
         for (let s of cond.state.split('')) {
             map[s] = (map[s] || 0) + 1;
@@ -129,7 +129,7 @@
         }
     }
 
-    const begin = new Date().getTime();    
+    const begin = new Date().getTime();
     const $body = document.getElementsByTagName('body')[0];
     $body.addEventListener('mousemove', onMousemove);
     $body.addEventListener('touchstart', onTouchStart);
@@ -199,7 +199,7 @@
                     $cell.classList.add(consts.colorMap[faceStickers[row * consts.size + col]]);
                     $face.appendChild($cell);
                 }
-            }            
+            }
             $disposableCube.appendChild($face);
         }
         return $disposableCube;
@@ -274,8 +274,13 @@
     }
 
     function loadOptions() {
-        const optionString = decodeURIComponent(document.cookie).replace(/^options=(.*)$/, '$1');
-        return JSON.parse(optionString || "{}");
+        const optionString = localStorage.getItem('options');
+        return JSON.parse(optionString || loadCookieOptions() || "{}");
+    }
+
+    // deprecated
+    function loadCookieOptions() {
+      return decodeURIComponent(document.cookie).replace(/^options=(.*)$/, '$1');
     }
 
     function updateOptionsCtrl(options) {
@@ -291,7 +296,7 @@
     }
 
     function storeOptions(options) {
-        document.cookie = encodeURIComponent(`options=${JSON.stringify(options)}`);
+        localStorage.setItem('options', JSON.stringify(options));
     }
 
     function filterConditions(conds, options) {
@@ -320,7 +325,7 @@
     // a: string[] // length=const.size*4
     function shiftRandomLL(a) {
         const ra = [];
-        
+
         const shift = Math.floor(Math.random() * 4) * consts.size;
         for (let i = 0; i < a.length; i++) {
             ra.push(a[(i + shift) % a.length]);
@@ -336,7 +341,7 @@
         }
         return a.map(e => map[e]);
     }
-    
+
     function getRandomFromArray(a) {
         return a[Math.floor(Math.random() * a.length)];
     }
