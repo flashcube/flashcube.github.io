@@ -1,15 +1,18 @@
 import React from 'react';
 import './App.css';
 import './default.css';
-import { Settings, SettingsState } from './components/Settings';
-import { plls, Pll } from './domains/steps';
+import { SettingsComponent, Settings } from './components/Settings';
+import { Pll } from './domains/steps';
 import { CubeComponent } from './components/CubeComponent';
 import { Face, Sticker } from './domains/Cube';
+import { deepMerge } from './Util';
 
 const initialState = {
   settings: {
-    coloredSide: true,
-    pllPatternFilter: plls.reduce((acc, pll) => ({ ...acc, [pll]: true }), {} as { [never in Pll]: boolean })
+    pll: {
+      coloredSide: true,
+      patternFilter: Pll.values.reduce((acc, pll) => ({ ...acc, [pll]: true }), {} as { [never in Pll]: boolean })
+    }
   },
   condition: {
     stickers: {
@@ -59,35 +62,18 @@ export class App extends React.Component<{}, typeof initialState> {
     }
 
     const begin = new Date().getTime();
-    const options = loadOptions();
+    const options = deepMerge(initialState.settings, loadOptions());
     this.setState(prevState => ({
       ...prevState,
       settings: options
     }));
     console.log(`load stored options: ${JSON.stringify(options)}`);
-    this.refreshCube();
+    this.refreshCube(options);
     console.log(`Finished. Elapsed: ${new Date().getTime() - begin}`);
   }
-  private updateColoredSide() {
-    this.setState(prevState => ({
-      ...prevState,
-      settings: {
-        ...prevState.settings,
-        coloredSide: !prevState.settings.coloredSide
-      }
-    }));
-  }
-  private updatePllPatternFilter(pll: Pll) {
-    this.setState(prevState => ({
-      ...prevState,
-      settings: {
-        ...prevState.settings,
-        pllPatternFilter: {
-          ...prevState.settings.pllPatternFilter,
-          [pll]: !prevState.settings.pllPatternFilter[pll]
-        }
-      }
-    }));
+
+  private updateSettings(settings: Settings) {
+    this.setState(prevState => deepMerge(prevState, { settings }));
   }
 
   private onMouseMove(clientPos: { clientX: number, clientY: number }) {
@@ -106,29 +92,16 @@ export class App extends React.Component<{}, typeof initialState> {
       }
     }));
   }
-  private updateAllPllOptions() {
-    this.setState(prevState => {
-      const { settings: prevSettings } = prevState;
-      const b = prevSettings.coloredSide && Object.entries(prevSettings.pllPatternFilter).every(e => e);
-      const settings = {
-        ...prevSettings,
-        coloredSide: !b,
-        pllPatternFilter: plls.reduce((acc, pll) => ({ ...acc, [pll]: !b }), {} as { [never in Pll]: boolean })
-      };
-      return { ...prevState, settings };
-    });
-  }
 
   componentDidUpdate(): void {
     this.storeOptions(this.state.settings);
   }
 
-  private storeOptions(options: SettingsState): void {
+  private storeOptions(options: Settings): void {
     localStorage.setItem('options', JSON.stringify(options));
   }
-  private refreshCube() {
-    const options = this.state.settings;
-    const candidates = settings.pllConditions.filter(c => options.pllPatternFilter[c.name]);
+  private refreshCube(options: Settings = this.state.settings) {
+    const candidates = settings.pllConditions.filter(c => options.pll.patternFilter[c.name]);
     if (candidates.length === 0) {
       candidates.push(settings.pllConditions[0]);
     }
@@ -138,7 +111,7 @@ export class App extends React.Component<{}, typeof initialState> {
     const stickers = toPllStickers(shuffled, randomedAxis);
 
     // Apply non-color side
-    if (!this.state.settings.coloredSide) {
+    if (!options.pll.coloredSide) {
       for (const f of ['f', 'r', 'b', 'l'] as const) {
         stickers[f] = stickers[f].slice(0, consts.size).concat(repeat('x', consts.size * (consts.size - 1)));
       }
@@ -183,10 +156,8 @@ export class App extends React.Component<{}, typeof initialState> {
           <CubeComponent condition={this.state.condition} cubePointer={this.state.cubePointer} onClick={() => this.refreshCube()} />
         </article>
         <footer>
-          <Settings state={{ ...this.state.settings }}
-            updateColoredSide={() => this.updateColoredSide()}
-            updatePllPatternFilter={pll => this.updatePllPatternFilter(pll)}
-            checkAll={() => this.updateAllPllOptions()}
+          <SettingsComponent state={{ ...this.state.settings }}
+            updateState={settings => this.updateSettings(settings)}
           />
         </footer>
       </div>
@@ -340,7 +311,7 @@ function toPllStickers(arr: Sticker[], axis: Axis): { [never in Face]: Sticker[]
 }
 
 
-function loadOptions(): SettingsState {
+function loadOptions(): Settings {
   const optionString = localStorage.getItem('options');
   if (optionString) {
     return JSON.parse(optionString);
