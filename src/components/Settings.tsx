@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Pll } from '../domains/steps';
 import { deepMerge } from '../Util';
 import { Button, CheckBox } from 'grommet';
@@ -46,7 +46,9 @@ function checkAll(props: Props): void {
   }));
 }
 
+
 export const SettingsComponent: React.FC<Props> = props => {
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const pllOptions = Pll.values.map(pll => {
     return (
       <li key={pll}>
@@ -60,18 +62,21 @@ export const SettingsComponent: React.FC<Props> = props => {
   });
 
   return (
-    <div className="settings unselectable">
-      <ul>
-        <li><Button icon={<Icons.Compliance />} active={false} label="Check all/nothing" onClick={() => checkAll(props)} /></li>
-        <li>
-          <CheckBox
-            label="colored side"
-            checked={props.state.pll.coloredSide}
-            onChange={() => updateColoredSide(props)}
-          />
-        </li>
-        {pllOptions}
-      </ul>
-    </div>
+    <>
+      <p><Button icon={<Icons.Menu />} onClick={() => setIsDrawerVisible(!isDrawerVisible)} /></p>
+      <div className={`settings unselectable ${isDrawerVisible ? '' : 'no-display'}`}>
+        <ul>
+          <li><Button className="small" icon={<Icons.Compliance />} label="Check all/nothing" onClick={() => checkAll(props)} /></li>
+          <li>
+            <CheckBox
+              label="colored side"
+              checked={props.state.pll.coloredSide}
+              onChange={() => updateColoredSide(props)}
+            />
+          </li>
+          {pllOptions}
+        </ul>
+      </div>
+    </>
   );
 }
