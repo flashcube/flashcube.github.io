@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Pll } from '../domains/steps';
 import { deepMerge } from '../Util';
+import { Button, CheckBox } from 'grommet';
+import * as Icons from 'grommet-icons';
 
 export interface Settings {
   pll: PllSettings;
@@ -44,37 +46,37 @@ function checkAll(props: Props): void {
   }));
 }
 
+
 export const SettingsComponent: React.FC<Props> = props => {
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const pllOptions = Pll.values.map(pll => {
-    const id = `Settings_option_pll_${pll}`;
     return (
       <li key={pll}>
-        <input
-          type="checkbox"
-          id={id}
+        <CheckBox
+          label={pll}
           checked={props.state.pll.patternFilter[pll]}
           onChange={() => updatePllPatternFilter(props, pll)}
         />
-        <label htmlFor={id}>{pll}</label>
       </li>
     )
   });
 
   return (
-    <div className="settings unselectable">
-      <p><button onClick={() => checkAll(props)}>check all</button></p>
-      <ul>
-        <li>
-          <input
-            type="checkbox"
-            id="Settings_option_colorSide"
-            checked={props.state.pll.coloredSide}
-            onChange={() => updateColoredSide(props)}
-          />
-          <label htmlFor="Settings_option_colorSide">colored side</label>
-        </li>
-        {pllOptions}
-      </ul>
-    </div>
+    <>
+      <p><Button icon={<Icons.Menu />} onClick={() => setIsDrawerVisible(!isDrawerVisible)} /></p>
+      <div className={`settings unselectable ${isDrawerVisible ? '' : 'no-display'}`}>
+        <ul>
+          <li><Button className="small" icon={<Icons.Compliance />} label="Check all/nothing" onClick={() => checkAll(props)} /></li>
+          <li>
+            <CheckBox
+              label="colored side"
+              checked={props.state.pll.coloredSide}
+              onChange={() => updateColoredSide(props)}
+            />
+          </li>
+          {pllOptions}
+        </ul>
+      </div>
+    </>
   );
 }

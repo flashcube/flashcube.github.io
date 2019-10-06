@@ -18,6 +18,12 @@ article {
     -o-perspective: 800;
     -ms-perspective: 800;
 }
+.settings {
+    width: 50%;
+}
+.no-display {
+    display: none;
+}
 .settings ul {
     margin: 0;
     padding: 0;
