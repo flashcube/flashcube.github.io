@@ -6,6 +6,7 @@ import { Pll } from './domains/steps';
 import { CubeComponent } from './components/CubeComponent';
 import { Face, Sticker } from './domains/Cube';
 import { deepMerge } from './Util';
+import { Grommet } from 'grommet';
 
 const initialState = {
   settings: {
@@ -145,8 +146,7 @@ export class App extends React.Component<{}, typeof initialState> {
 
   render() {
     return (
-      <div
-        className="App"
+      <Grommet plain
         onTouchMove={e => this.onMouseMove(getTouchEventPos(e))}
         onTouchStart={() => this.onTouchStart()}
         onMouseMove={e => this.onMouseMove(getMouseEventPos(e))}
@@ -160,7 +160,7 @@ export class App extends React.Component<{}, typeof initialState> {
             updateState={settings => this.updateSettings(settings)}
           />
         </footer>
-      </div>
+      </Grommet>
     );
   }
 }
