@@ -1,5 +1,5 @@
 :root {
-  --cell-size: 8vw;
+  --cell-size: 12vw;
   --perspective: 800px;
 }
 
@@ -37,7 +37,7 @@ article {
 }
 .cube {
   position: absolute;
-  top: 40vh;
+  top: calc(50vh - var(--cell-size));
   margin: 0;
   transform-style: preserve-3d;
 }
