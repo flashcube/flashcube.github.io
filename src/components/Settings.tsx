@@ -7,7 +7,7 @@ export interface Settings {
 }
 export interface PllSettings {
   coloredSide: boolean;
-  patternFilter: { [never in Pll]: boolean };
+  patternFilter: { [p in Pll]: boolean };
 }
 interface Props {
   state: Settings;
@@ -48,7 +48,7 @@ function checkAll(props: Props): void {
         coloredSide: !allChecked,
         patternFilter: Pll.values.reduce(
           (acc, pll) => ({ ...acc, [pll]: !allChecked }),
-          {} as { [never in Pll]: boolean }
+          {} as { [p in Pll]: boolean }
         ),
       },
     })
