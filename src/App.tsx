@@ -7,6 +7,10 @@ import { CubeComponent } from './components/CubeComponent';
 import { Face, Sticker } from './domains/Cube';
 import { deepMerge } from './Util';
 
+document.addEventListener( "touchmove", e => e.preventDefault(), {
+  passive: false,
+});
+
 const initialState = {
   settings: {
     pll: {
