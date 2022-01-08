@@ -11,7 +11,7 @@ const initialState = {
   settings: {
     pll: {
       coloredSide: true,
-      patternFilter: Pll.values.reduce((acc, pll) => ({ ...acc, [pll]: true }), {} as { [never in Pll]: boolean })
+      patternFilter: Pll.values.reduce((acc, pll) => ({ ...acc, [pll]: true }), {} as { [a in Pll]: boolean })
     }
   },
   condition: {
@@ -288,7 +288,7 @@ function shiftRandomLL(a: Sticker[]): Sticker[] {
 
 function shuffleColorLL(a: Sticker[], axis: Axis): Sticker[] {
   const shuffled = shiftRandomAxis(axis);
-  const map = {} as { [never in Sticker]: Sticker };
+  const map = {} as { [a in Sticker]: Sticker };
   for (let i = 0; i < 6; i++) {
     map[axis[i]] = shuffled[i];
   }
@@ -296,7 +296,7 @@ function shuffleColorLL(a: Sticker[], axis: Axis): Sticker[] {
 }
 
 
-function toPllStickers(arr: Sticker[], axis: Axis): { [never in Face]: Sticker[] } {
+function toPllStickers(arr: Sticker[], axis: Axis): { [a in Face]: Sticker[] } {
   const ud = consts.size ** 2;
   const frbl = ud - consts.size;
 

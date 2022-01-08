@@ -1,5 +1,5 @@
 import React from "react";
-import { Face, Sticker } from "../domains/Cube";
+import { Face, faces, Sticker } from "../domains/Cube";
 
 const consts = {
     size: 3,
@@ -16,7 +16,7 @@ const consts = {
 
 interface Props {
     condition: {
-        stickers: { [never in Face]: Sticker[] },
+        stickers: { [a in Face]: Sticker[] },
         size: number,
     },
     cubePointer: {
@@ -27,7 +27,7 @@ interface Props {
 };
 export const CubeComponent: React.FC<Props> = ({ condition: { stickers, size }, cubePointer, onClick }) => {
     return <div className="cube" style={{ transform: `rotateX(${cubePointer.x}deg) rotateY(${cubePointer.y}deg)` }} onClick={onClick}>{
-        Face.values.map(face => <FaceComponent key={face} condition={{
+        faces.values.map(face => <FaceComponent key={face} condition={{
             stickers: stickers[face],
             face,
             size
