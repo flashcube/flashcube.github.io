@@ -16,32 +16,43 @@ interface Props {
 
 function updateColoredSide(props: Props) {
   const { state, updateState } = props;
-  updateState(deepMerge(state, {
-    pll: {
-      coloredSide: !state.pll.coloredSide
-    }
-  }));
+  updateState(
+    deepMerge(state, {
+      pll: {
+        coloredSide: !state.pll.coloredSide,
+      },
+    })
+  );
 }
 
 function updatePllPatternFilter(props: Props, pll: Pll): void {
   const { state, updateState } = props;
-  updateState(deepMerge(state, {
-    pll: {
-      patternFilter: {
-        [pll]: !state.pll.patternFilter[pll]
-      }
-    }
-  }));
+  updateState(
+    deepMerge(state, {
+      pll: {
+        patternFilter: {
+          [pll]: !state.pll.patternFilter[pll],
+        },
+      },
+    })
+  );
 }
 function checkAll(props: Props): void {
   const { state, updateState } = props;
-  const allChecked = Object.values(state.pll.patternFilter).every(e => e) && state.pll.coloredSide;
-  updateState(deepMerge(state, {
-    pll: {
-      coloredSide: !allChecked,
-      patternFilter: Pll.values.reduce((acc, pll) => ({ ...acc, [pll]: !allChecked }), {} as { [never in Pll]: boolean })
-    }
-  }));
+  const allChecked =
+    Object.values(state.pll.patternFilter).every(e => e) &&
+    state.pll.coloredSide;
+  updateState(
+    deepMerge(state, {
+      pll: {
+        coloredSide: !allChecked,
+        patternFilter: Pll.values.reduce(
+          (acc, pll) => ({ ...acc, [pll]: !allChecked }),
+          {} as { [never in Pll]: boolean }
+        ),
+      },
+    })
+  );
 }
 
 export const SettingsComponent: React.FC<Props> = props => {
@@ -57,12 +68,14 @@ export const SettingsComponent: React.FC<Props> = props => {
         />
         <label htmlFor={id}>{pll}</label>
       </li>
-    )
+    );
   });
 
   return (
     <div className="settings unselectable">
-      <p><button onClick={() => checkAll(props)}>check all</button></p>
+      <p>
+        <button onClick={() => checkAll(props)}>check all</button>
+      </p>
       <ul>
         <li>
           <input
@@ -77,4 +90,4 @@ export const SettingsComponent: React.FC<Props> = props => {
       </ul>
     </div>
   );
-}
+};

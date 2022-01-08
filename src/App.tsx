@@ -7,7 +7,7 @@ import { CubeComponent } from './components/CubeComponent';
 import { Face, Sticker } from './domains/Cube';
 import { deepMerge } from './Util';
 
-document.addEventListener( "touchmove", e => e.preventDefault(), {
+document.addEventListener('touchmove', e => e.preventDefault(), {
   passive: false,
 });
 
@@ -15,8 +15,11 @@ const initialState = {
   settings: {
     pll: {
       coloredSide: true,
-      patternFilter: Pll.values.reduce((acc, pll) => ({ ...acc, [pll]: true }), {} as { [a in Pll]: boolean })
-    }
+      patternFilter: Pll.values.reduce(
+        (acc, pll) => ({ ...acc, [pll]: true }),
+        {} as { [a in Pll]: boolean }
+      ),
+    },
   },
   condition: {
     stickers: {
@@ -25,18 +28,18 @@ const initialState = {
       r: repeat('x' as Sticker, 12),
       b: repeat('x' as Sticker, 12),
       l: repeat('x' as Sticker, 12),
-      d: repeat('x' as Sticker, 12)
+      d: repeat('x' as Sticker, 12),
     },
-    size: 6
+    size: 6,
   },
   baseMousePos: {
     x: null as number | null,
-    y: null as number | null
+    y: null as number | null,
   },
   cubePointer: {
     x: 345 as number,
-    y: -40 as number
-  }
+    y: -40 as number,
+  },
 };
 type Axis = [Sticker, Sticker, Sticker, Sticker, Sticker, Sticker];
 
@@ -59,7 +62,9 @@ export class App extends React.Component<{}, typeof initialState> {
       }
       for (const s in map) {
         if (map[s] !== consts.size) {
-          console.log(`pllConditions[${i}] ${name}is suspicious: ${JSON.stringify(map)}`);
+          console.log(
+            `pllConditions[${i}] ${name}is suspicious: ${JSON.stringify(map)}`
+          );
           break;
         }
       }
@@ -69,7 +74,7 @@ export class App extends React.Component<{}, typeof initialState> {
     const options = deepMerge(initialState.settings, loadOptions());
     this.setState(prevState => ({
       ...prevState,
-      settings: options
+      settings: options,
     }));
     console.log(`load stored options: ${JSON.stringify(options)}`);
     this.refreshCube(options);
@@ -80,20 +85,26 @@ export class App extends React.Component<{}, typeof initialState> {
     this.setState(prevState => deepMerge(prevState, { settings }));
   }
 
-  private onMouseMove(clientPos: { clientX: number, clientY: number }) {
+  private onMouseMove(clientPos: { clientX: number; clientY: number }) {
     const { clientX, clientY } = clientPos;
-    const dx = this.state.baseMousePos.x === null ? 0 : (clientX - this.state.baseMousePos.x);
-    const dy = this.state.baseMousePos.y === null ? 0 : (this.state.baseMousePos.y - clientY);
+    const dx =
+      this.state.baseMousePos.x === null
+        ? 0
+        : clientX - this.state.baseMousePos.x;
+    const dy =
+      this.state.baseMousePos.y === null
+        ? 0
+        : this.state.baseMousePos.y - clientY;
     this.setState(prevState => ({
       ...prevState,
       baseMousePos: {
         x: clientX,
-        y: clientY
+        y: clientY,
       },
       cubePointer: {
         x: Math.max(Math.min(prevState.cubePointer.x + dy, 375), 230),
-        y: prevState.cubePointer.y + dx
-      }
+        y: prevState.cubePointer.y + dx,
+      },
     }));
   }
 
@@ -105,45 +116,51 @@ export class App extends React.Component<{}, typeof initialState> {
     localStorage.setItem('options', JSON.stringify(options));
   }
   private refreshCube(options: Settings = this.state.settings) {
-    const candidates = settings.pllConditions.filter(c => options.pll.patternFilter[c.name]);
+    const candidates = settings.pllConditions.filter(
+      c => options.pll.patternFilter[c.name]
+    );
     if (candidates.length === 0) {
       candidates.push(settings.pllConditions[0]);
     }
     const ll = oneOf(candidates);
-    const shuffled = shuffleColorLL(shiftRandomLL(ll.state.split('') as Sticker[]), settings.axis);
+    const shuffled = shuffleColorLL(
+      shiftRandomLL(ll.state.split('') as Sticker[]),
+      settings.axis
+    );
     const randomedAxis = shiftRandomAxis(settings.axis);
     const stickers = toPllStickers(shuffled, randomedAxis);
 
     // Apply non-color side
     if (!options.pll.coloredSide) {
       for (const f of ['f', 'r', 'b', 'l'] as const) {
-        stickers[f] = stickers[f].slice(0, consts.size).concat(repeat('x', consts.size * (consts.size - 1)));
+        stickers[f] = stickers[f]
+          .slice(0, consts.size)
+          .concat(repeat('x', consts.size * (consts.size - 1)));
       }
       stickers.d = repeat('x', consts.size ** 2);
     }
-
 
     console.log(`${ll.name} selected.`);
     this.setState(prevState => ({
       ...prevState,
       condition: {
         stickers,
-        size: consts.size
+        size: consts.size,
       },
       baseMousePos: {
         x: null,
-        y: null
+        y: null,
       },
       cubePointer: {
         x: 345,
-        y: -40
-      }
+        y: -40,
+      },
     }));
   }
   private onTouchStart() {
     this.setState(prevState => ({
       ...prevState,
-      baseMousePos: { x: null, y: null }
+      baseMousePos: { x: null, y: null },
     }));
   }
 
@@ -157,10 +174,15 @@ export class App extends React.Component<{}, typeof initialState> {
       >
         <header></header>
         <article>
-          <CubeComponent condition={this.state.condition} cubePointer={this.state.cubePointer} onClick={() => this.refreshCube()} />
+          <CubeComponent
+            condition={this.state.condition}
+            cubePointer={this.state.cubePointer}
+            onClick={() => this.refreshCube()}
+          />
         </article>
         <footer>
-          <SettingsComponent state={{ ...this.state.settings }}
+          <SettingsComponent
+            state={{ ...this.state.settings }}
             updateState={settings => this.updateSettings(settings)}
           />
         </footer>
@@ -182,89 +204,89 @@ const settings = {
   pllConditions: [
     {
       name: 'Ub',
-      state: 'bobrbrgggoro' // FFF->RRR->BBB->LLL
+      state: 'bobrbrgggoro', // FFF->RRR->BBB->LLL
     } as const,
     {
       name: 'Ua',
-      state: 'brbrorgggobo'
+      state: 'brbrorgggobo',
     } as const,
     {
       name: 'Ab',
-      state: 'rbrgrobggoob'
+      state: 'rbrgrobggoob',
     } as const,
     {
       name: 'Aa',
-      state: 'gbobrbrggoor'
+      state: 'gbobrbrggoor',
     } as const,
     {
       name: 'Z',
-      state: 'brbrbrgogogo'
+      state: 'brbrbrgogogo',
     } as const,
     {
       name: 'H',
-      state: 'bgbrorgbgoro'
+      state: 'bgbrorgbgoro',
     } as const,
     {
       name: 'E',
-      state: 'obrgrbrgobog'
+      state: 'obrgrbrgobog',
     } as const,
     {
       name: 'T',
-      state: 'bbrgobrggoro'
+      state: 'bbrgobrggoro',
     } as const,
     {
       name: 'V',
-      state: 'oorgrbrbobgg'
+      state: 'oorgrbrbobgg',
     } as const,
     {
       name: 'F',
-      state: 'bgrgrbrbgooo'
+      state: 'bgrgrbrbgooo',
     } as const,
     {
       name: 'Rb',
-      state: 'brbrbgogrgoo'
+      state: 'brbrbgogrgoo',
     } as const,
     {
       name: 'Ra',
-      state: 'rrgogrgbobob'
+      state: 'rrgogrgbobob',
     } as const,
     {
       name: 'Jb',
-      state: 'brrgbbrggooo'
+      state: 'brrgbbrggooo',
     } as const,
     {
       name: 'Ja',
-      state: 'oobrrrggobbg'
+      state: 'oobrrrggobbg',
     } as const,
     {
       name: 'Y',
-      state: 'bbgorrgobrgo'
+      state: 'bbgorrgobrgo',
     } as const,
     {
       name: 'Gd',
-      state: 'borggbrbgoro'
+      state: 'borggbrbgoro',
     } as const,
     {
       name: 'Gc',
-      state: 'rogobrggobrb'
+      state: 'rogobrggobrb',
     } as const,
     {
       name: 'Ga',
-      state: 'obbrgoborgrg'
+      state: 'obbrgoborgrg',
     } as const,
     {
       name: 'Gb',
-      state: 'bgrgbbrogoro'
+      state: 'bgrgbbrogoro',
     } as const,
     {
       name: 'Nb',
-      state: 'bbgoorggbrro'
+      state: 'bbgoorggbrro',
     } as const,
     {
       name: 'Na',
-      state: 'bggorrgbbroo'
-    } as const
-  ]
+      state: 'bggorrgbbroo',
+    } as const,
+  ],
 };
 
 // a= (U + side*4 + D)
@@ -274,7 +296,7 @@ function shiftRandomAxis(a: Axis): Axis {
   ra.push(a[0]);
   const shift = Math.floor(Math.random() * 4);
   for (let i = 0; i < 4; i++) {
-    ra.push(a[(i + shift) % 4 + 1]);
+    ra.push(a[((i + shift) % 4) + 1]);
   }
   ra.push(a[5]);
   return [ra[0], ra[1], ra[2], ra[3], ra[4], ra[5]];
@@ -299,7 +321,6 @@ function shuffleColorLL(a: Sticker[], axis: Axis): Sticker[] {
   return a.map(e => map[e]);
 }
 
-
 function toPllStickers(arr: Sticker[], axis: Axis): { [a in Face]: Sticker[] } {
   const ud = consts.size ** 2;
   const frbl = ud - consts.size;
@@ -310,10 +331,9 @@ function toPllStickers(arr: Sticker[], axis: Axis): { [a in Face]: Sticker[] } {
     r: arr.slice(3, 6).concat(repeat(axis[2], frbl)),
     b: arr.slice(6, 9).concat(repeat(axis[3], frbl)),
     l: arr.slice(9, 12).concat(repeat(axis[4], frbl)),
-    d: repeat(axis[5], ud)
-  }
+    d: repeat(axis[5], ud),
+  };
 }
-
 
 function loadOptions(): Settings {
   const optionString = localStorage.getItem('options');
@@ -323,12 +343,16 @@ function loadOptions(): Settings {
   return initialState.settings;
 }
 
-
-function getMouseEventPos(event: React.MouseEvent<HTMLDivElement, MouseEvent>): { clientX: number, clientY: number } {
+function getMouseEventPos(
+  event: React.MouseEvent<HTMLDivElement, MouseEvent>
+): { clientX: number; clientY: number } {
   const { clientX, clientY } = event;
   return { clientX, clientY };
 }
-function getTouchEventPos(event: React.TouchEvent<HTMLDivElement>): { clientX: number, clientY: number } {
+function getTouchEventPos(event: React.TouchEvent<HTMLDivElement>): {
+  clientX: number;
+  clientY: number;
+} {
   const { clientX, clientY } = event.touches[0];
   return { clientX, clientY };
 }
@@ -342,7 +366,7 @@ const consts = {
     g: 'green',
     y: 'yellow',
     w: 'white',
-    x: 'gray'
-  } as const
+    x: 'gray',
+  } as const,
 };
 export default App;
