@@ -37,8 +37,8 @@ const initialState = {
     y: null as number | null,
   },
   cubePointer: {
-    x: 345 as number,
-    y: -40 as number,
+    x: 340,
+    y: -40,
   },
 };
 type Axis = [Sticker, Sticker, Sticker, Sticker, Sticker, Sticker];
@@ -152,8 +152,7 @@ export class App extends React.Component<{}, typeof initialState> {
         y: null,
       },
       cubePointer: {
-        x: 345,
-        y: -40,
+        ...initialState.cubePointer,
       },
     }));
   }
