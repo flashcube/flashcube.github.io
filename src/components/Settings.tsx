@@ -4,7 +4,9 @@ import { Pll, plls } from '../domains/steps';
 import { deepMerge, identity } from '../Util';
 
 export interface Settings {
-  color: { [f in Face]: string };
+  color: {
+    [f in Face | 'x']: string;
+  };
   pll: PllSettings;
 }
 export interface PllSettings {

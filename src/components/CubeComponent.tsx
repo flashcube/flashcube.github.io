@@ -1,5 +1,5 @@
 import React from 'react';
-import { Face, faces, Sticker } from '../domains/Cube';
+import { Face, faces } from '../domains/Cube';
 
 const consts = {
   size: 3,
@@ -37,7 +37,6 @@ export const CubeComponent: React.FC<Props> = ({
   onClick,
 }) => {
   // apply color
-  console.log(`settings.color`, settings.color);
   const stickers_ = Object.entries(stickers).reduce(
     (acc, [cubeFace, cellFaces]) => {
       return {
@@ -63,9 +62,9 @@ export const CubeComponent: React.FC<Props> = ({
         }),
       };
     },
-    {} as { [f in Face]: Sticker[] }
+    {} as { [f in Face]: string[] }
   );
-  console.log(stickers_);
+
   return (
     <div
       className="cube"
@@ -91,7 +90,7 @@ export const CubeComponent: React.FC<Props> = ({
 interface FaceComponentProps {
   condition: {
     face: Face;
-    stickers: Sticker[];
+    stickers: string[];
     size: number;
   };
 }
@@ -101,12 +100,28 @@ const FaceComponent: React.FC<FaceComponentProps> = ({
   const cells = [];
   for (let row = 0; row < size; row++) {
     for (let col = 0; col < size; col++) {
+      const { style, classColor } = (() => {
+        const preservedColors = [
+          'red',
+          'blue',
+          'orange',
+          'green',
+          'yellow',
+          'white',
+          'gray',
+        ];
+        const sticker = stickers[row * consts.size + col];
+        const preserved = preservedColors.includes(sticker);
+        return {
+          classColor: preserved ? sticker : '',
+          style: preserved ? {} : { backgroundColor: sticker },
+        };
+      })();
       cells.push(
         <div
           key={`pif-${row}-${col}`}
-          className={`cell pif-top-${row} pif-left-${col} ${
-            stickers[row * consts.size + col]
-          }`}
+          className={`cell pif-top-${row} pif-left-${col} ${classColor}`}
+          style={style}
         ></div>
       );
     }

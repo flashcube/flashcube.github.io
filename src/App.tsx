@@ -12,6 +12,7 @@ import {
   sideFaces,
 } from './domains/Cube';
 import { deepMerge, rotate } from './Util';
+import { validateColorSetting } from './domains/color';
 
 document.addEventListener('touchmove', e => e.preventDefault(), {
   passive: false,
@@ -96,7 +97,10 @@ export class App extends React.Component<{}, typeof initialState> {
   }
 
   private updateSettings(settings: Settings) {
-    this.setState(prevState => deepMerge(prevState, { settings }));
+    const s = validateColorSetting(settings.color)
+      ? settings
+      : { ...settings, color: initialState.settings.color };
+    this.setState(prevState => deepMerge(prevState, { settings: s }));
   }
 
   private onMouseMove(clientPos: { clientX: number; clientY: number }) {
@@ -262,6 +266,8 @@ function loadOptions(): Settings {
       Object.values(options.color).every(c => typeof c === 'string')
         ? options
         : { ...options, color: initialState.settings.color },
+    // FIXME: 保存済みの color を無視。設定できるようになったら削除する
+    (options: Settings) => ({ ...options, color: initialState.settings.color }),
   ].reduce((acc, f) => f(acc), loaded);
 }
 
