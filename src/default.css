@@ -1,6 +1,6 @@
 :root {
   --cell-size: 12vmin;
-  --perspective: 600px;
+  --perspective: 60vmin;
   --perspective-origin: center 50vh;
 }
 
