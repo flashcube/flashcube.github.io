@@ -1,5 +1,5 @@
 :root {
-  --cell-size: 12vw;
+  --cell-size: 12vmin;
   --perspective: 800px;
 }
 
