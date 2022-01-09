@@ -1,8 +1,12 @@
 import React from 'react';
-import { Pll } from '../domains/steps';
-import { deepMerge } from '../Util';
+import { Face } from '../domains/Cube';
+import { Pll, plls } from '../domains/steps';
+import { deepMerge, identity } from '../Util';
 
 export interface Settings {
+  color: {
+    [f in Face | 'x']: string;
+  };
   pll: PllSettings;
 }
 export interface PllSettings {
@@ -40,13 +44,13 @@ function updatePllPatternFilter(props: Props, pll: Pll): void {
 function checkAll(props: Props): void {
   const { state, updateState } = props;
   const allChecked =
-    Object.values(state.pll.patternFilter).every(e => e) &&
+    Object.values(state.pll.patternFilter).every(identity) &&
     state.pll.coloredSide;
   updateState(
     deepMerge(state, {
       pll: {
         coloredSide: !allChecked,
-        patternFilter: Pll.values.reduce(
+        patternFilter: plls.reduce(
           (acc, pll) => ({ ...acc, [pll]: !allChecked }),
           {} as { [p in Pll]: boolean }
         ),
@@ -56,7 +60,7 @@ function checkAll(props: Props): void {
 }
 
 export const SettingsComponent: React.FC<Props> = props => {
-  const pllOptions = Pll.values.map(pll => {
+  const pllOptions = plls.map(pll => {
     const id = `Settings_option_pll_${pll}`;
     return (
       <li key={pll}>
