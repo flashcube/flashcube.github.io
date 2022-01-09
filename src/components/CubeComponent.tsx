@@ -38,7 +38,7 @@ export const CubeComponent: React.FC<Props> = ({
       }}
       onClick={onClick}
     >
-      {faces.values.map(face => (
+      {faces.map(face => (
         <FaceComponent
           key={face}
           condition={{

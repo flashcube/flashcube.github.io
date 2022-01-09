@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import './default.css';
 import { SettingsComponent, Settings } from './components/Settings';
-import { Pll } from './domains/steps';
+import { Pll, plls } from './domains/steps';
 import { CubeComponent } from './components/CubeComponent';
 import { Face, Sticker } from './domains/Cube';
 import { deepMerge } from './Util';
@@ -15,7 +15,7 @@ const initialState = {
   settings: {
     pll: {
       coloredSide: true,
-      patternFilter: Pll.values.reduce(
+      patternFilter: plls.reduce(
         (acc, pll) => ({ ...acc, [pll]: true }),
         {} as { [a in Pll]: boolean }
       ),
@@ -148,8 +148,7 @@ export class App extends React.Component<{}, typeof initialState> {
         size: consts.size,
       },
       baseMousePos: {
-        x: null,
-        y: null,
+        ...initialState.baseMousePos,
       },
       cubePointer: {
         ...initialState.cubePointer,

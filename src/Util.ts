@@ -9,3 +9,7 @@ export function deepMerge<T1, T2>(
 ): T1 & T2 {
   return deepmerge(x, y, options || { arrayMerge: overwriteMerge });
 }
+
+export function identity<A>(a: A): A {
+  return a;
+}
