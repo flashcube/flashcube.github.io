@@ -1,6 +1,7 @@
 :root {
   --cell-size: 12vmin;
-  --perspective: 800px;
+  --perspective: 600px;
+  --perspective-origin: center 50vh;
 }
 
 html,
@@ -22,6 +23,11 @@ article {
   -webkit-perspective: var(--perspective);
   -o-perspective: var(--perspective);
   -ms-perspective: var(--perspective);
+  perspective-origin: var(--perspective-origin);
+  -moz-perspective-origin: var(--perspective-origin);
+  -webkit-perspective-origin: var(--perspective-origin);
+  -o-perspective-origin: var(--perspective-origin);
+  -ms-perspective-origin: var(--perspective-origin);
 }
 .settings ul {
   margin: 0;
@@ -37,7 +43,7 @@ article {
 }
 .cube {
   position: absolute;
-  top: calc(50vh - var(--cell-size));
+  top: 50vh;
   margin: 0;
   transform-style: preserve-3d;
 }
