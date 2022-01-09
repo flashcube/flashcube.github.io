@@ -3,20 +3,25 @@ import { Face, faces, Sticker } from '../domains/Cube';
 
 const consts = {
   size: 3,
-  colorMap: {
-    r: 'red',
-    b: 'blue',
-    o: 'orange',
-    g: 'green',
-    y: 'yellow',
-    w: 'white',
-    x: 'gray',
-  } as const,
 };
 
 interface Props {
+  settings: {
+    pll: {
+      coloredSide: boolean;
+    };
+    color: {
+      u: string;
+      f: string;
+      r: string;
+      b: string;
+      l: string;
+      d: string;
+      x: string;
+    };
+  };
   condition: {
-    stickers: { [a in Face]: Sticker[] };
+    stickers: { [a in Face]: Face[] };
     size: number;
   };
   cubePointer: {
@@ -26,10 +31,41 @@ interface Props {
   onClick: () => void;
 }
 export const CubeComponent: React.FC<Props> = ({
+  settings,
   condition: { stickers, size },
   cubePointer,
   onClick,
 }) => {
+  // apply color
+  console.log(`settings.color`, settings.color);
+  const stickers_ = Object.entries(stickers).reduce(
+    (acc, [cubeFace, cellFaces]) => {
+      return {
+        ...acc,
+        [cubeFace]: cellFaces.map((f, cellFaceIndex) => {
+          function isColored() {
+            if (settings.pll.coloredSide) {
+              return true;
+            }
+            switch (cubeFace) {
+              case 'u':
+                return true;
+              case 'f':
+              case 'r':
+              case 'b':
+              case 'l':
+                return cellFaceIndex < 3;
+              case 'd':
+                return false;
+            }
+          }
+          return isColored() ? settings.color[f] : settings.color['x'];
+        }),
+      };
+    },
+    {} as { [f in Face]: Sticker[] }
+  );
+  console.log(stickers_);
   return (
     <div
       className="cube"
@@ -42,7 +78,7 @@ export const CubeComponent: React.FC<Props> = ({
         <FaceComponent
           key={face}
           condition={{
-            stickers: stickers[face],
+            stickers: stickers_[face],
             face,
             size,
           }}
@@ -69,7 +105,7 @@ const FaceComponent: React.FC<FaceComponentProps> = ({
         <div
           key={`pif-${row}-${col}`}
           className={`cell pif-top-${row} pif-left-${col} ${
-            consts.colorMap[stickers[row * consts.size + col]]
+            stickers[row * consts.size + col]
           }`}
         ></div>
       );

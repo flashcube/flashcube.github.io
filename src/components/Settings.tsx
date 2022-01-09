@@ -1,8 +1,10 @@
 import React from 'react';
+import { Face } from '../domains/Cube';
 import { Pll, plls } from '../domains/steps';
 import { deepMerge, identity } from '../Util';
 
 export interface Settings {
+  color: { [f in Face]: string };
   pll: PllSettings;
 }
 export interface PllSettings {
