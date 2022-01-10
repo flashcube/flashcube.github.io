@@ -2,6 +2,7 @@ import React from 'react';
 import { Face } from '../domains/cube/cube';
 import { Pll, plls } from '../domains/steps';
 import { deepMerge, identity } from '../Util';
+import { Button } from 'theme-ui';
 
 export interface Settings {
   color: {
@@ -9,12 +10,15 @@ export interface Settings {
   };
   pll: PllSettings;
 }
+
 export interface PllSettings {
   coloredSide: boolean;
   patternFilter: { [p in Pll]: boolean };
 }
+
 interface Props {
   state: Settings;
+
   updateState(settings: Settings): void;
 }
 
@@ -41,6 +45,7 @@ function updatePllPatternFilter(props: Props, pll: Pll): void {
     })
   );
 }
+
 function checkAll(props: Props): void {
   const { state, updateState } = props;
   const allChecked =
@@ -78,7 +83,7 @@ export const SettingsComponent: React.FC<Props> = props => {
   return (
     <div className="settings unselectable">
       <p>
-        <button onClick={() => checkAll(props)}>check all</button>
+        <Button onClick={() => checkAll(props)}>check all</Button>
       </p>
       <ul>
         <li>

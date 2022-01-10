@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 import './default.css';
 import { SettingsComponent, Settings } from './components/Settings';
 import { Pll, plls } from './domains/steps';
@@ -13,6 +12,8 @@ import {
 } from './domains/cube/cube';
 import { deepMerge, rotate } from './Util';
 import { validateColorSetting } from './domains/color';
+import { theme } from './theme';
+import { ThemeProvider } from 'theme-ui';
 
 document.addEventListener('touchmove', e => e.preventDefault(), {
   passive: false,
@@ -128,11 +129,7 @@ export class App extends React.Component<{}, typeof initialState> {
   }
 
   componentDidUpdate(): void {
-    this.storeOptions(this.state.settings);
-  }
-
-  private storeOptions(options: Settings): void {
-    localStorage.setItem('options', JSON.stringify(options));
+    storeOptions(this.state.settings);
   }
 
   private refreshCube(options: Settings = this.state.settings) {
@@ -183,28 +180,29 @@ export class App extends React.Component<{}, typeof initialState> {
 
   render() {
     return (
-      <div
-        className="App"
-        onTouchMove={e => this.onMouseMove(getTouchEventPos(e))}
-        onTouchStart={() => this.onTouchStart()}
-        onMouseMove={e => this.onMouseMove(getMouseEventPos(e))}
-      >
-        <header></header>
-        <article>
-          <CubeComponent
-            settings={this.state.settings}
-            condition={this.state.condition}
-            cubePointer={this.state.cubePointer}
-            onClick={() => this.refreshCube()}
-          />
-        </article>
-        <footer>
-          <SettingsComponent
-            state={{ ...this.state.settings }}
-            updateState={settings => this.updateSettings(settings)}
-          />
-        </footer>
-      </div>
+      <ThemeProvider theme={theme}>
+        <div
+          className="App"
+          onTouchMove={e => this.onMouseMove(getTouchEventPos(e))}
+          onTouchStart={() => this.onTouchStart()}
+          onMouseMove={e => this.onMouseMove(getMouseEventPos(e))}
+        >
+          <article>
+            <CubeComponent
+              settings={this.state.settings}
+              condition={this.state.condition}
+              cubePointer={this.state.cubePointer}
+              onClick={() => this.refreshCube()}
+            />
+          </article>
+          <footer>
+            <SettingsComponent
+              state={{ ...this.state.settings }}
+              updateState={settings => this.updateSettings(settings)}
+            />
+          </footer>
+        </div>
+      </ThemeProvider>
     );
   }
 }
@@ -293,3 +291,7 @@ const consts = {
   size: 3,
 };
 export default App;
+
+function storeOptions(options: Settings): void {
+  localStorage.setItem('options', JSON.stringify(options));
+}
