@@ -142,17 +142,17 @@ export class App extends React.Component<{}, typeof initialState> {
     }
 
     function llState(): LastLayerState {
-      const ll = oneOf(candidates);
+      const ll = oneOf(...candidates);
       console.log(`${ll.name} selected.`);
 
       return new LastLayer(ll.state.split(''))
-        .pattern(oneOf([0, 1, 2, 3]))
-        .rotate(oneOf([0, 1, 2, 3]))
+        .pattern(oneOf(0, 1, 2, 3))
+        .rotate(oneOf(0, 1, 2, 3))
         .state();
     }
 
     function f2lState(): readonly SideFace[] {
-      return rotate(sideFaces, oneOf([0, 1, 2, 3]));
+      return rotate(sideFaces, oneOf(0, 1, 2, 3));
     }
 
     const cubeState = cubeFromLastLayerState(llState(), f2lState());
@@ -210,8 +210,8 @@ function repeat<A>(a: A, n: number): A[] {
   return (Array(n) as A[]).fill(a, 0, n);
 }
 
-function oneOf<A>(a: A[]): A {
-  return a[Math.floor(Math.random() * a.length)];
+function oneOf<A>(...xs: readonly A[]): A {
+  return xs[Math.floor(Math.random() * xs.length)];
 }
 
 const pllsImpl = {
