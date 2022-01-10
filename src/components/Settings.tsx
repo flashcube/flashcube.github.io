@@ -1,5 +1,5 @@
 import React from 'react';
-import { Face } from '../domains/Cube';
+import { Face } from '../domains/cube/cube';
 import { Pll, plls } from '../domains/steps';
 import { deepMerge, identity } from '../Util';
 

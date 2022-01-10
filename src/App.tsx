@@ -10,7 +10,7 @@ import {
   LastLayerState,
   SideFace,
   sideFaces,
-} from './domains/Cube';
+} from './domains/cube/cube';
 import { deepMerge, rotate } from './Util';
 import { validateColorSetting } from './domains/color';
 
@@ -63,6 +63,7 @@ export class App extends React.Component<{}, typeof initialState> {
     super(props, state);
     this.state = initialState;
   }
+
   componentDidMount() {
     // Validate pllConditions (Not Strict)
     for (let i = 0; i < pllsImpl.pllConditions.length; i++) {
@@ -133,6 +134,7 @@ export class App extends React.Component<{}, typeof initialState> {
   private storeOptions(options: Settings): void {
     localStorage.setItem('options', JSON.stringify(options));
   }
+
   private refreshCube(options: Settings = this.state.settings) {
     const candidates = pllsImpl.pllConditions.filter(
       c => options.pll.patternFilter[c.name]
@@ -171,6 +173,7 @@ export class App extends React.Component<{}, typeof initialState> {
       },
     }));
   }
+
   private onTouchStart() {
     this.setState(prevState => ({
       ...prevState,
@@ -277,6 +280,7 @@ function getMouseEventPos(
   const { clientX, clientY } = event;
   return { clientX, clientY };
 }
+
 function getTouchEventPos(event: React.TouchEvent<HTMLDivElement>): {
   clientX: number;
   clientY: number;

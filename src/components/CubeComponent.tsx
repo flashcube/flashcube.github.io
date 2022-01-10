@@ -1,5 +1,5 @@
 import React from 'react';
-import { Face, faces } from '../domains/Cube';
+import { Face, faces } from '../domains/cube/cube';
 
 const consts = {
   size: 3,
