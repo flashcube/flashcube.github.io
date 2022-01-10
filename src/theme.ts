@@ -8,13 +8,12 @@ export const theme: Theme = {
     ...carbonplanTheme.colors,
     text: 'white',
     background: 'black',
-    'button-background': 'gray',
     primary: 'white',
   },
   buttons: {
     primary: {
       color: 'background',
-      bg: 'button-background',
+      bg: 'text',
       '&:hover': {
         bg: 'primary',
         cursor: 'pointer',

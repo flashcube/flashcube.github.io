@@ -187,6 +187,12 @@ export class App extends React.Component<{}, typeof initialState> {
           onTouchStart={() => this.onTouchStart()}
           onMouseMove={e => this.onMouseMove(getMouseEventPos(e))}
         >
+          <nav>
+            <SettingsComponent
+              state={{ ...this.state.settings }}
+              updateState={settings => this.updateSettings(settings)}
+            />
+          </nav>
           <article>
             <CubeComponent
               settings={this.state.settings}
@@ -195,12 +201,6 @@ export class App extends React.Component<{}, typeof initialState> {
               onClick={() => this.refreshCube()}
             />
           </article>
-          <footer>
-            <SettingsComponent
-              state={{ ...this.state.settings }}
-              updateState={settings => this.updateSettings(settings)}
-            />
-          </footer>
         </div>
       </ThemeProvider>
     );
