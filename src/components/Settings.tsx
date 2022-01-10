@@ -1,7 +1,10 @@
-import React from 'react';
-import { Face } from '../domains/Cube';
+import React, { useState } from 'react';
+import { Face } from '../domains/cube/cube';
 import { Pll, plls } from '../domains/steps';
 import { deepMerge, identity } from '../Util';
+import { Button, IconButton } from 'theme-ui';
+import Modal from 'react-modal';
+import './Settings.css';
 
 export interface Settings {
   color: {
@@ -9,12 +12,15 @@ export interface Settings {
   };
   pll: PllSettings;
 }
+
 export interface PllSettings {
   coloredSide: boolean;
   patternFilter: { [p in Pll]: boolean };
 }
+
 interface Props {
   state: Settings;
+
   updateState(settings: Settings): void;
 }
 
@@ -41,6 +47,7 @@ function updatePllPatternFilter(props: Props, pll: Pll): void {
     })
   );
 }
+
 function checkAll(props: Props): void {
   const { state, updateState } = props;
   const allChecked =
@@ -59,7 +66,34 @@ function checkAll(props: Props): void {
   );
 }
 
+const customStyles = {
+  content: {
+    top: '0',
+    left: '50%',
+    right: 'auto',
+    bottom: '0',
+    width: '50vw',
+    height: '100vh',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  },
+};
+
 export const SettingsComponent: React.FC<Props> = props => {
+  const [modalIsOpen, setIsOpen] = useState(false);
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  function afterOpenModal() {
+    // references are now sync'd and can be accessed.
+    // subtitle.style.color = '#f00';
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+  }
+
   const pllOptions = plls.map(pll => {
     const id = `Settings_option_pll_${pll}`;
     return (
@@ -75,23 +109,47 @@ export const SettingsComponent: React.FC<Props> = props => {
     );
   });
 
+  const menuButton = modalIsOpen ? null : (
+    <IconButton onClick={openModal} id="menuButton">
+      <svg viewBox="0 0 100 100" width="200" height="200" fill="currentcolor">
+        <rect y="10" width="80" height="10" />
+        <rect y="45" width="80" height="10" />
+        <rect y="85" width="80" height="10" />
+      </svg>
+    </IconButton>
+  );
+
   return (
-    <div className="settings unselectable">
-      <p>
-        <button onClick={() => checkAll(props)}>check all</button>
-      </p>
-      <ul>
-        <li>
-          <input
-            type="checkbox"
-            id="Settings_option_colorSide"
-            checked={props.state.pll.coloredSide}
-            onChange={() => updateColoredSide(props)}
-          />
-          <label htmlFor="Settings_option_colorSide">colored side</label>
-        </li>
-        {pllOptions}
-      </ul>
-    </div>
+    <>
+      {menuButton}
+      <Modal
+        isOpen={modalIsOpen}
+        onAfterOpen={afterOpenModal}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+      >
+        <div className="settings unselectable">
+          <IconButton onClick={closeModal} id="closeButton">
+            x
+          </IconButton>
+          <p>
+            <Button onClick={() => checkAll(props)}>check all</Button>
+          </p>
+          <ul>
+            <li>
+              <input
+                type="checkbox"
+                id="Settings_option_colorSide"
+                checked={props.state.pll.coloredSide}
+                onChange={() => updateColoredSide(props)}
+              />
+              <label htmlFor="Settings_option_colorSide">colored side</label>
+            </li>
+            {pllOptions}
+          </ul>
+        </div>
+      </Modal>
+    </>
   );
 };

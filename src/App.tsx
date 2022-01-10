@@ -1,18 +1,19 @@
 import React from 'react';
-import './App.css';
 import './default.css';
 import { SettingsComponent, Settings } from './components/Settings';
 import { Pll, plls } from './domains/steps';
 import { CubeComponent } from './components/CubeComponent';
 import {
   Face,
-  LastLayer,
   LastLayerState,
+  parseLastLayerFromFlattenExp,
   SideFace,
   sideFaces,
-} from './domains/Cube';
+} from './domains/cube/cube';
 import { deepMerge, rotate } from './Util';
 import { validateColorSetting } from './domains/color';
+import { theme } from './theme';
+import { ThemeProvider } from 'theme-ui';
 
 document.addEventListener('touchmove', e => e.preventDefault(), {
   passive: false,
@@ -38,13 +39,13 @@ const initialState = {
     },
   },
   condition: {
-    stickers: {
-      u: repeat('u' as Face, 12),
-      f: repeat('f' as Face, 12),
-      r: repeat('r' as Face, 12),
-      b: repeat('b' as Face, 12),
-      l: repeat('l' as Face, 12),
-      d: repeat('d' as Face, 12),
+    cube: {
+      u: repeat('u' as Face, 9),
+      f: repeat('f' as Face, 9),
+      r: repeat('r' as Face, 9),
+      b: repeat('b' as Face, 9),
+      l: repeat('l' as Face, 9),
+      d: repeat('d' as Face, 9),
     },
     size: 6,
   },
@@ -63,6 +64,7 @@ export class App extends React.Component<{}, typeof initialState> {
     super(props, state);
     this.state = initialState;
   }
+
   componentDidMount() {
     // Validate pllConditions (Not Strict)
     for (let i = 0; i < pllsImpl.pllConditions.length; i++) {
@@ -127,12 +129,9 @@ export class App extends React.Component<{}, typeof initialState> {
   }
 
   componentDidUpdate(): void {
-    this.storeOptions(this.state.settings);
+    storeOptions(this.state.settings);
   }
 
-  private storeOptions(options: Settings): void {
-    localStorage.setItem('options', JSON.stringify(options));
-  }
   private refreshCube(options: Settings = this.state.settings) {
     const candidates = pllsImpl.pllConditions.filter(
       c => options.pll.patternFilter[c.name]
@@ -145,13 +144,13 @@ export class App extends React.Component<{}, typeof initialState> {
       const ll = oneOf(...candidates);
       console.log(`${ll.name} selected.`);
 
-      return new LastLayer(ll.state.split(''))
+      return parseLastLayerFromFlattenExp(ll.state.split(''))
         .pattern(oneOf(0, 1, 2, 3))
         .rotate(oneOf(0, 1, 2, 3))
         .state();
     }
 
-    function f2lState(): readonly SideFace[] {
+    function f2lState(): SideFace[] {
       return rotate(sideFaces, oneOf(0, 1, 2, 3));
     }
 
@@ -160,7 +159,7 @@ export class App extends React.Component<{}, typeof initialState> {
     this.setState(prevState => ({
       ...prevState,
       condition: {
-        stickers: cubeState,
+        cube: cubeState,
         size: consts.size,
       },
       baseMousePos: {
@@ -171,6 +170,7 @@ export class App extends React.Component<{}, typeof initialState> {
       },
     }));
   }
+
   private onTouchStart() {
     this.setState(prevState => ({
       ...prevState,
@@ -180,28 +180,29 @@ export class App extends React.Component<{}, typeof initialState> {
 
   render() {
     return (
-      <div
-        className="App"
-        onTouchMove={e => this.onMouseMove(getTouchEventPos(e))}
-        onTouchStart={() => this.onTouchStart()}
-        onMouseMove={e => this.onMouseMove(getMouseEventPos(e))}
-      >
-        <header></header>
-        <article>
-          <CubeComponent
-            settings={this.state.settings}
-            condition={this.state.condition}
-            cubePointer={this.state.cubePointer}
-            onClick={() => this.refreshCube()}
-          />
-        </article>
-        <footer>
-          <SettingsComponent
-            state={{ ...this.state.settings }}
-            updateState={settings => this.updateSettings(settings)}
-          />
-        </footer>
-      </div>
+      <ThemeProvider theme={theme}>
+        <div
+          className="App"
+          onTouchMove={e => this.onMouseMove(getTouchEventPos(e))}
+          onTouchStart={() => this.onTouchStart()}
+          onMouseMove={e => this.onMouseMove(getMouseEventPos(e))}
+        >
+          <nav>
+            <SettingsComponent
+              state={{ ...this.state.settings }}
+              updateState={settings => this.updateSettings(settings)}
+            />
+          </nav>
+          <article>
+            <CubeComponent
+              settings={this.state.settings}
+              condition={this.state.condition}
+              cubePointer={this.state.cubePointer}
+              onClick={() => this.refreshCube()}
+            />
+          </article>
+        </div>
+      </ThemeProvider>
     );
   }
 }
@@ -277,6 +278,7 @@ function getMouseEventPos(
   const { clientX, clientY } = event;
   return { clientX, clientY };
 }
+
 function getTouchEventPos(event: React.TouchEvent<HTMLDivElement>): {
   clientX: number;
   clientY: number;
@@ -289,3 +291,7 @@ const consts = {
   size: 3,
 };
 export default App;
+
+function storeOptions(options: Settings): void {
+  localStorage.setItem('options', JSON.stringify(options));
+}
