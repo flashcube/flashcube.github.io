@@ -1,4 +1,4 @@
-import { rotate, times } from '../../Util';
+import { rotate } from '../../Util';
 
 export const sideFaces = ['f', 'r', 'b', 'l'] as const;
 export type SideFace = typeof sideFaces[number];
@@ -8,50 +8,58 @@ export type Face = typeof faces[number];
 
 export type LastLayerState = { [f in SideFace]: SideFace[] };
 
+export type Turn = 0 | 1 | 2 | 3;
+
 export class LastLayer {
-  // [F,F,F,R,R,R,B,B,B,L,L,L]
-  private readonly data: SideFace[];
+  // [
+  //   [F, F, F],
+  //   [R, R, R],
+  //   [B, B, B],
+  //   [L, L, L],
+  // ]
+  constructor(private readonly data: SideFace[][]) {}
 
-  // [F,F,F,R,R,R,B,B,B,L,L,L]
-  constructor(flattenExp: string[]) {
-    this.data = this.validate(flattenExp);
+  pattern(turns: Turn): LastLayer {
+    const map = faceToFace(turns);
+    return new LastLayer(this.data.map(cells => cells.map(c => map[c])));
   }
 
-  pattern(turns: 0 | 1 | 2 | 3): LastLayer {
-    const rotated = rotate(sideFaces, turns);
-    const map = sideFaces.reduce(
-      (acc, _, idx) => ({
-        ...acc,
-        [sideFaces[idx]]: rotated[idx],
-      }),
-      {} as { [face in SideFace]: SideFace }
-    );
-    return new LastLayer(this.data.map(f => map[f]));
-  }
-
-  rotate(turns: 0 | 1 | 2 | 3): LastLayer {
-    const newExp = times(turns).reduce(acc => {
-      const [_1, _2, _3, ...tail] = acc;
-      return [...tail, _1, _2, _3];
-    }, this.data);
-    return new LastLayer(newExp);
+  rotate(turns: Turn): LastLayer {
+    return new LastLayer(rotate(this.data, turns));
   }
 
   state(): LastLayerState {
-    return {
-      f: this.data.slice(0, 3),
-      r: this.data.slice(3, 6),
-      b: this.data.slice(6, 9),
-      l: this.data.slice(9),
-    };
+    return sideFaces.reduce(
+      (acc, face, index) => ({
+        ...acc,
+        [face]: this.data[index],
+      }),
+      {} as LastLayerState
+    );
   }
+}
 
-  private validate(fs: string[]): SideFace[] {
-    if (
-      fs.length === 12 &&
-      fs.every(f => (sideFaces as readonly string[]).includes(f))
-    )
-      return fs as SideFace[];
-    else throw new Error('AssertError');
+// exp: [F,F,F,R,R,R,B,B,B,L,L,L]
+export function parseLastLayerFromFlattenExp(exp: string[]): LastLayer {
+  if (
+    exp.length === 12 &&
+    exp.every(f => (sideFaces as readonly string[]).includes(f))
+  ) {
+    return new LastLayer(
+      [0, 3, 6, 9].map(index => exp.slice(index, index + 3) as SideFace[])
+    );
+  } else {
+    throw new Error('AssertError');
   }
+}
+
+function faceToFace(turns: Turn) {
+  const rotated = rotate(sideFaces, turns);
+  return sideFaces.reduce(
+    (acc, _, index) => ({
+      ...acc,
+      [sideFaces[index]]: rotated[index],
+    }),
+    {} as { [face in SideFace]: SideFace }
+  );
 }

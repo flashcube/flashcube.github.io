@@ -6,8 +6,8 @@ import { Pll, plls } from './domains/steps';
 import { CubeComponent } from './components/CubeComponent';
 import {
   Face,
-  LastLayer,
   LastLayerState,
+  parseLastLayerFromFlattenExp,
   SideFace,
   sideFaces,
 } from './domains/cube/cube';
@@ -147,13 +147,13 @@ export class App extends React.Component<{}, typeof initialState> {
       const ll = oneOf(...candidates);
       console.log(`${ll.name} selected.`);
 
-      return new LastLayer(ll.state.split(''))
+      return parseLastLayerFromFlattenExp(ll.state.split(''))
         .pattern(oneOf(0, 1, 2, 3))
         .rotate(oneOf(0, 1, 2, 3))
         .state();
     }
 
-    function f2lState(): readonly SideFace[] {
+    function f2lState(): SideFace[] {
       return rotate(sideFaces, oneOf(0, 1, 2, 3));
     }
 
