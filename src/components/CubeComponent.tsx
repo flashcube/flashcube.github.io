@@ -21,7 +21,7 @@ interface Props {
     };
   };
   condition: {
-    stickers: { [a in Face]: Face[] };
+    cube: { [a in Face]: Face[] };
     size: number;
   };
   cubePointer: {
@@ -30,14 +30,15 @@ interface Props {
   };
   onClick: () => void;
 }
+
 export const CubeComponent: React.FC<Props> = ({
   settings,
-  condition: { stickers, size },
+  condition,
   cubePointer,
   onClick,
 }) => {
   // apply color
-  const stickers_ = Object.entries(stickers).reduce(
+  const stickers = Object.entries(condition.cube).reduce(
     (acc, [cubeFace, cellFaces]) => {
       return {
         ...acc,
@@ -58,6 +59,7 @@ export const CubeComponent: React.FC<Props> = ({
                 return false;
             }
           }
+
           return isColored() ? settings.color[f] : settings.color['x'];
         }),
       };
@@ -77,9 +79,9 @@ export const CubeComponent: React.FC<Props> = ({
         <FaceComponent
           key={face}
           condition={{
-            stickers: stickers_[face],
+            stickers: stickers[face],
             face,
-            size,
+            size: condition.size,
           }}
         />
       ))}
@@ -94,6 +96,7 @@ interface FaceComponentProps {
     size: number;
   };
 }
+
 const FaceComponent: React.FC<FaceComponentProps> = ({
   condition: { face, stickers, size },
 }) => {
@@ -122,7 +125,7 @@ const FaceComponent: React.FC<FaceComponentProps> = ({
           key={`pif-${row}-${col}`}
           className={`cell pif-top-${row} pif-left-${col} ${classColor}`}
           style={style}
-        ></div>
+        />
       );
     }
   }

@@ -38,13 +38,13 @@ const initialState = {
     },
   },
   condition: {
-    stickers: {
-      u: repeat('u' as Face, 12),
-      f: repeat('f' as Face, 12),
-      r: repeat('r' as Face, 12),
-      b: repeat('b' as Face, 12),
-      l: repeat('l' as Face, 12),
-      d: repeat('d' as Face, 12),
+    cube: {
+      u: repeat('u' as Face, 9),
+      f: repeat('f' as Face, 9),
+      r: repeat('r' as Face, 9),
+      b: repeat('b' as Face, 9),
+      l: repeat('l' as Face, 9),
+      d: repeat('d' as Face, 9),
     },
     size: 6,
   },
@@ -162,7 +162,7 @@ export class App extends React.Component<{}, typeof initialState> {
     this.setState(prevState => ({
       ...prevState,
       condition: {
-        stickers: cubeState,
+        cube: cubeState,
         size: consts.size,
       },
       baseMousePos: {
