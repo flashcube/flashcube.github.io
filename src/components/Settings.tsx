@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Face } from '../domains/cube/cube';
 import { Pll, plls } from '../domains/steps';
-import { deepMerge, identity } from '../Util';
+import { deepMerge, entries, identity } from '../Util';
 import { Box, Button, Flex, IconButton, Label, Switch } from 'theme-ui';
 import Modal from 'react-modal';
 import './Settings.css';
+import { Tab, TabList, TabPanel, Tabs } from '@component-controls/components';
+import 'react-tabs/style/react-tabs.css';
 
 export interface Settings {
   color: {
@@ -69,13 +71,14 @@ function checkAll(props: Props): void {
 
 function updateDFaces(props: Props, face: Face): void {
   const { state, updateState } = props;
-  updateState(
-    deepMerge(state, {
-      dFaces: {
-        [face]: !state.dFaces[face],
-      },
-    })
-  );
+  const settings = deepMerge(state, {
+    dFaces: {
+      [face]: !state.dFaces[face],
+    },
+  });
+  if (Object.values(settings.dFaces).some(identity)) {
+    updateState(settings);
+  }
 }
 
 const customStyles = {
@@ -121,8 +124,7 @@ export const SettingsComponent: React.FC<Props> = props => {
     );
   });
 
-  const dFaces = Object.entries(props.state.dFaces).map(([_face, enabled]) => {
-    const face = _face as Face;
+  const dFaces = entries(props.state.dFaces).map(([face, enabled]) => {
     const id = `Settings_option_dFaces_${face}`;
     return (
       <Flex
@@ -130,7 +132,7 @@ export const SettingsComponent: React.FC<Props> = props => {
         sx={{
           justifyContent: 'space-between',
           alignItems: 'center',
-          py: 4,
+          py: 1,
         }}
       >
         <Label htmlFor={id} sx={{ flex: 1 }}>
@@ -171,23 +173,35 @@ export const SettingsComponent: React.FC<Props> = props => {
           <IconButton onClick={closeModal} id="closeButton">
             x
           </IconButton>
-          <p>
-            <Button onClick={() => checkAll(props)}>check all</Button>
-          </p>
-          <ul>
-            <li>
-              <input
-                type="checkbox"
-                id="Settings_option_colorSide"
-                checked={props.state.pll.coloredSide}
-                onChange={() => updateColoredSide(props)}
-              />
-              <label htmlFor="Settings_option_colorSide">colored side</label>
-            </li>
-            {pllOptions}
-            <h3>d-face acceptances</h3>
-            {dFaces}
-          </ul>
+          <Tabs>
+            <TabList>
+              <Tab key="tab_pll">pll</Tab>
+              <Tab key="tab_color">color</Tab>
+            </TabList>
+            <TabPanel key="panel_pll">
+              <p>
+                <Button onClick={() => checkAll(props)}>check all</Button>
+              </p>
+              <ul>
+                <li>
+                  <input
+                    type="checkbox"
+                    id="Settings_option_colorSide"
+                    checked={props.state.pll.coloredSide}
+                    onChange={() => updateColoredSide(props)}
+                  />
+                  <label htmlFor="Settings_option_colorSide">
+                    colored side
+                  </label>
+                </li>
+                {pllOptions}
+              </ul>
+            </TabPanel>
+            <TabPanel key="panel_color">
+              <h3>d-face acceptances</h3>
+              {dFaces}
+            </TabPanel>
+          </Tabs>
         </div>
       </Modal>
     </>

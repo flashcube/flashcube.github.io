@@ -1,16 +1,15 @@
 import React from 'react';
 import './default.css';
-import { SettingsComponent, Settings } from './components/Settings';
+import { Settings, SettingsComponent } from './components/Settings';
 import { Pll, plls } from './domains/steps';
 import { CubeComponent } from './components/CubeComponent';
 import {
+  Cube,
   Face,
-  LastLayerState,
   parseLastLayerFromFlattenExp,
-  SideFace,
-  sideFaces,
+  PllState,
 } from './domains/cube/cube';
-import { deepMerge, rotate } from './Util';
+import { deepMerge, entries, repeat } from './Util';
 import { validateColorSetting } from './domains/color';
 import { theme } from './theme';
 import { ThemeProvider } from 'theme-ui';
@@ -148,21 +147,29 @@ export class App extends React.Component<{}, typeof initialState> {
       candidates.push(pllsImpl.pllConditions[0]);
     }
 
-    function llState(): LastLayerState {
-      const ll = oneOf(...candidates);
-      console.log(`${ll.name} selected.`);
+    const dFace = oneOf(
+      ...entries(options.dFaces)
+        .filter(([, enabled]) => enabled)
+        .map(([face]) => face)
+    );
 
-      return parseLastLayerFromFlattenExp(ll.state.split(''))
+    function buildLlState(): [PllState, string] {
+      const ll = oneOf(...candidates);
+      const state = parseLastLayerFromFlattenExp(ll.state.split(''))
         .pattern(oneOf(0, 1, 2, 3))
         .rotate(oneOf(0, 1, 2, 3))
         .state();
+      return [state, ll.name];
     }
 
-    function f2lState(): SideFace[] {
-      return rotate(sideFaces, oneOf(0, 1, 2, 3));
-    }
+    const [llState, llName] = buildLlState();
+    const cubeState = new Cube()
+      .direct(dFace)
+      .y(oneOf(0, 1, 2, 3))
+      .applyPll(llState)
+      .state();
 
-    const cubeState = cubeFromLastLayerState(llState(), f2lState());
+    console.log(`d-face(${dFace}), pll(${llName}) selected.`);
 
     this.setState(prevState => ({
       ...prevState,
@@ -215,10 +222,6 @@ export class App extends React.Component<{}, typeof initialState> {
   }
 }
 
-function repeat<A>(a: A, n: number): A[] {
-  return (Array(n) as A[]).fill(a, 0, n);
-}
-
 function oneOf<A>(...xs: readonly A[]): A {
   return xs[Math.floor(Math.random() * xs.length)];
 }
@@ -249,23 +252,6 @@ const pllsImpl = {
     { name: 'Na', state: 'bffrllfbblrr' } as const,
   ],
 };
-
-function cubeFromLastLayerState(
-  ll: LastLayerState,
-  f2l: readonly SideFace[]
-): { [a in Face]: Face[] } {
-  const ud = consts.size ** 2;
-  const frbl = ud - consts.size;
-
-  return {
-    u: repeat('u', ud),
-    f: ll.f.concat(repeat(f2l[0], frbl)),
-    r: ll.r.concat(repeat(f2l[1], frbl)),
-    b: ll.b.concat(repeat(f2l[2], frbl)),
-    l: ll.l.concat(repeat(f2l[3], frbl)),
-    d: repeat('d', ud),
-  };
-}
 
 function loadOptions(): Settings {
   const loaded = JSON.parse(localStorage.getItem('options') || '{}');
