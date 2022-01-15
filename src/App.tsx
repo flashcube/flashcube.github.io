@@ -37,6 +37,14 @@ const initialState = {
       d: 'white',
       x: 'gray',
     },
+    dFaces: {
+      u: false,
+      f: false,
+      r: false,
+      b: false,
+      l: false,
+      d: true,
+    },
   },
   condition: {
     cube: {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Face } from '../domains/cube/cube';
 import { Pll, plls } from '../domains/steps';
 import { deepMerge, identity } from '../Util';
-import { Button, IconButton } from 'theme-ui';
+import { Box, Button, Flex, IconButton, Label, Switch } from 'theme-ui';
 import Modal from 'react-modal';
 import './Settings.css';
 
@@ -11,6 +11,7 @@ export interface Settings {
     [f in Face | 'x']: string;
   };
   pll: PllSettings;
+  dFaces: { [f in Face]: boolean };
 }
 
 export interface PllSettings {
@@ -66,6 +67,17 @@ function checkAll(props: Props): void {
   );
 }
 
+function updateDFaces(props: Props, face: Face): void {
+  const { state, updateState } = props;
+  updateState(
+    deepMerge(state, {
+      dFaces: {
+        [face]: !state.dFaces[face],
+      },
+    })
+  );
+}
+
 const customStyles = {
   content: {
     top: '0',
@@ -109,6 +121,32 @@ export const SettingsComponent: React.FC<Props> = props => {
     );
   });
 
+  const dFaces = Object.entries(props.state.dFaces).map(([_face, enabled]) => {
+    const face = _face as Face;
+    const id = `Settings_option_dFaces_${face}`;
+    return (
+      <Flex
+        key={face}
+        sx={{
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          py: 4,
+        }}
+      >
+        <Label htmlFor={id} sx={{ flex: 1 }}>
+          <Button sx={{ bg: props.state.color[face] }}>{face}</Button>
+        </Label>
+        <Box>
+          <Switch
+            id={id}
+            checked={enabled}
+            onChange={() => updateDFaces(props, face)}
+          />
+        </Box>
+      </Flex>
+    );
+  });
+
   const menuButton = modalIsOpen ? null : (
     <IconButton onClick={openModal} id="menuButton">
       <svg viewBox="0 0 100 100" width="200" height="200" fill="currentcolor">
@@ -147,6 +185,8 @@ export const SettingsComponent: React.FC<Props> = props => {
               <label htmlFor="Settings_option_colorSide">colored side</label>
             </li>
             {pllOptions}
+            <h3>d-face acceptances</h3>
+            {dFaces}
           </ul>
         </div>
       </Modal>
