@@ -1,25 +1,16 @@
 import React, { useState } from 'react';
 import { Face } from '../domains/cube/cube';
 import { Pll, plls } from '../domains/steps';
-import { deepMerge, entries, identity } from '../Util';
-import {
-  Box,
-  Button,
-  Flex,
-  IconButton,
-  Label,
-  MenuButton,
-  Switch,
-} from 'theme-ui';
+import { deepMerge, identity } from '../Util';
+import { Box, Button, Grid, IconButton, Input, MenuButton } from 'theme-ui';
 import Modal from 'react-modal';
 import './Settings.css';
 import { Tab, TabList, TabPanel, Tabs } from '@component-controls/components';
 import 'react-tabs/style/react-tabs.css';
+import { Sticker } from '../domains/color';
 
 export interface Settings {
-  color: {
-    [f in Face | 'x']: string;
-  };
+  color: { [s in Sticker]: string };
   pll: PllSettings;
   dFaces: { [f in Face]: boolean };
 }
@@ -89,13 +80,21 @@ function updateDFaces(props: Props, face: Face): void {
   }
 }
 
+function updateColor(props: Props, face: Sticker, value: string): void {
+  const { state, updateState } = props;
+  updateState({
+    ...state,
+    color: { ...state.color, [face]: value },
+  });
+}
+
 const customStyles = {
   content: {
     top: '0',
-    left: '50%',
+    left: '20%',
     right: 'auto',
     bottom: '0',
-    width: '50vw',
+    width: '80vw',
     height: '100vh',
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
@@ -132,30 +131,92 @@ export const SettingsComponent: React.FC<Props> = props => {
     );
   });
 
-  const dFaces = entries(props.state.dFaces).map(([face, enabled]) => {
-    const id = `Settings_option_dFaces_${face}`;
+  const sticker = (
+    <Grid columns={[4]}>
+      <div />
+      <Input
+        sx={{ borderColor: props.state.color['u'] }}
+        value={props.state.color['u']}
+        onChange={e => updateColor(props, 'u', e.target.value)}
+      />
+      <div />
+      <div />
+      <Input
+        sx={{ borderColor: props.state.color['l'] }}
+        value={props.state.color['l']}
+        onChange={e => updateColor(props, 'l', e.target.value)}
+      />
+      <Input
+        sx={{ borderColor: props.state.color['f'] }}
+        value={props.state.color['f']}
+        onChange={e => updateColor(props, 'f', e.target.value)}
+      />
+      <Input
+        sx={{ borderColor: props.state.color['r'] }}
+        value={props.state.color['r']}
+        onChange={e => updateColor(props, 'r', e.target.value)}
+      />
+      <Input
+        sx={{ borderColor: props.state.color['b'] }}
+        value={props.state.color['b']}
+        onChange={e => updateColor(props, 'b', e.target.value)}
+      />
+      <div />
+      <Input
+        sx={{ borderColor: props.state.color['d'] }}
+        value={props.state.color['d']}
+        onChange={e => updateColor(props, 'd', e.target.value)}
+      />
+      <div />
+      <Input
+        sx={{ borderColor: props.state.color['x'] }}
+        value={props.state.color['x']}
+        onChange={e => updateColor(props, 'x', e.target.value)}
+      />
+    </Grid>
+  );
+
+  const boxStyle = {
+    width: '100%',
+    p: '8px',
+  };
+
+  function dFaceButton(face: Face) {
     return (
-      <Flex
-        key={face}
+      <Box
         sx={{
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          py: 1,
+          ...boxStyle,
+          color: props.state.dFaces[face] ? 'black' : 'white',
+          border: '1px solid',
+          borderRadius: '4px',
+          borderColor: props.state.color[face],
+          bg: props.state.dFaces[face]
+            ? props.state.color[face]
+            : 'rgba(0,0,0,0)',
         }}
+        onClick={() => updateDFaces(props, face)}
       >
-        <Label htmlFor={id} sx={{ flex: 1 }}>
-          <Button sx={{ bg: props.state.color[face] }}>{face}</Button>
-        </Label>
-        <Box>
-          <Switch
-            id={id}
-            checked={enabled}
-            onChange={() => updateDFaces(props, face)}
-          />
-        </Box>
-      </Flex>
+        {face}
+      </Box>
     );
-  });
+  }
+
+  const dFaces = (
+    <Grid columns={[4]}>
+      <div />
+      {dFaceButton('u')}
+      <div />
+      <div />
+      {dFaceButton('l')}
+      {dFaceButton('f')}
+      {dFaceButton('r')}
+      {dFaceButton('b')}
+      <div />
+      {dFaceButton('d')}
+      <div />
+      <div />
+    </Grid>
+  );
 
   const menuButton = modalIsOpen ? null : (
     <MenuButton onClick={openModal} id="menuButton" />
@@ -200,6 +261,8 @@ export const SettingsComponent: React.FC<Props> = props => {
               </ul>
             </TabPanel>
             <TabPanel key="panel_color">
+              <h3>sticker</h3>
+              {sticker}
               <h3>d-face acceptances</h3>
               {dFaces}
             </TabPanel>

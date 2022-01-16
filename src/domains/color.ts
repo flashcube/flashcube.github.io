@@ -1,6 +1,7 @@
 import { Settings } from '../components/Settings';
+import { cells } from './cube/cube';
 
-const stickers = ['y', 'g', 'b', 'o', 'r', 'w', 'x'] as const;
+export const stickers = [...cells, 'x'] as const;
 export type Sticker = typeof stickers[number];
 
 export function validateColorSetting(color: Settings['color']): boolean {

@@ -1,6 +1,6 @@
 import { entries, repeat, rotate, times } from '../../Util';
 
-const cells = ['u', 'f', 'r', 'b', 'l', 'd'] as const;
+export const cells = ['u', 'f', 'r', 'b', 'l', 'd'] as const;
 type Cell = typeof cells[number];
 export namespace CellValues {
   export const [u, f, r, b, l, d] = cells;
