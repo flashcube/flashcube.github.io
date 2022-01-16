@@ -1,5 +1,6 @@
 import React from 'react';
 import { Face, faces } from '../domains/cube/cube';
+import { Box } from 'theme-ui';
 
 const consts = {
   size: 3,
@@ -103,28 +104,11 @@ const FaceComponent: React.FC<FaceComponentProps> = ({
   const cells = [];
   for (let row = 0; row < size; row++) {
     for (let col = 0; col < size; col++) {
-      const { style, classColor } = (() => {
-        const preservedColors = [
-          'red',
-          'blue',
-          'orange',
-          'green',
-          'yellow',
-          'white',
-          'gray',
-        ];
-        const sticker = stickers[row * consts.size + col];
-        const preserved = preservedColors.includes(sticker);
-        return {
-          classColor: preserved ? sticker : '',
-          style: preserved ? {} : { backgroundColor: sticker },
-        };
-      })();
       cells.push(
-        <div
+        <Box
+          sx={{ bg: stickers[row * consts.size + col] }}
           key={`pif-${row}-${col}`}
-          className={`cell pif-top-${row} pif-left-${col} ${classColor}`}
-          style={style}
+          className={`cell pif-top-${row} pif-left-${col}`}
         />
       );
     }
