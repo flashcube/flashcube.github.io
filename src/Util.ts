@@ -27,3 +27,16 @@ export function rotate<T>(xs: readonly T[], n: number = 1): T[] {
     [...xs]
   );
 }
+
+export function entries<P extends keyof T, T>(o: T): [P, T[P]][] {
+  // Object.entries<T>(o: { [s: string]: T } | ArrayLike<T>): [string, T][];
+  return Object.entries(o) as unknown as [P, T[P]][];
+}
+
+export function repeat<A>(a: A, n: number): A[] {
+  return (Array(n) as A[]).fill(a, 0, n);
+}
+
+export function assertNever(value: never): never {
+  throw new Error(value);
+}
