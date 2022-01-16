@@ -2,7 +2,15 @@ import React, { useState } from 'react';
 import { Face } from '../domains/cube/cube';
 import { Pll, plls } from '../domains/steps';
 import { deepMerge, entries, identity } from '../Util';
-import { Box, Button, Flex, IconButton, Label, Switch } from 'theme-ui';
+import {
+  Box,
+  Button,
+  Flex,
+  IconButton,
+  Label,
+  MenuButton,
+  Switch,
+} from 'theme-ui';
 import Modal from 'react-modal';
 import './Settings.css';
 import { Tab, TabList, TabPanel, Tabs } from '@component-controls/components';
@@ -150,13 +158,7 @@ export const SettingsComponent: React.FC<Props> = props => {
   });
 
   const menuButton = modalIsOpen ? null : (
-    <IconButton onClick={openModal} id="menuButton">
-      <svg viewBox="0 0 100 100" width="200" height="200" fill="currentcolor">
-        <rect y="10" width="80" height="10" />
-        <rect y="45" width="80" height="10" />
-        <rect y="85" width="80" height="10" />
-      </svg>
-    </IconButton>
+    <MenuButton onClick={openModal} id="menuButton" />
   );
 
   return (
