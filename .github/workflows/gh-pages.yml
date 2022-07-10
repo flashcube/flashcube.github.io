@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - $default-branch
-  pull_request:
 
 jobs:
   deploy:
@@ -25,8 +24,7 @@ jobs:
       - run: npm test
 
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.ref == "refs/heads/develop" }}
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+          folder: build
+          branch: master
