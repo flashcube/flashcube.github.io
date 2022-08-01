@@ -4,7 +4,6 @@
   "private": true,
   "homepage": "https://flashcube.github.io/",
   "dependencies": {
-    "@carbonplan/theme": "^7.0.0",
     "@component-controls/components": "^4.0.3",
     "react": "17.0.2",
     "react-app-polyfill": "3.0.0",
@@ -12,7 +11,7 @@
     "react-dom": "17.0.2",
     "react-modal": "^3.14.4",
     "react-refresh": "0.11.0",
-    "theme-ui": "^0.13.1"
+    "theme-ui": "^0.14.7"
   },
   "scripts": {
     "start": "node scripts/start.js",
@@ -47,7 +46,7 @@
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.4",
     "@svgr/webpack": "6.1.2",
     "@types/jest": "27.4.0",
-    "@types/node": "16.11.19",
+    "@types/node": "^16.11.47",
     "@types/react": "17.0.38",
     "@types/react-dom": "17.0.11",
     "@types/react-modal": "^3.13.1",
