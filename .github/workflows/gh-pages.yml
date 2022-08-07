@@ -6,7 +6,7 @@ on:
       - develop
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -22,9 +22,19 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
-
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
+      - uses: actions/upload-pages-artifact@v1
         with:
-          folder: build
-          branch: master
+          path: build
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
